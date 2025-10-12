@@ -1,30 +1,30 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-WORKDIR /var/www/html
+WORKDIR /app
 
 # تثبيت الاعتماديات الأساسية
-RUN apt-get update && apt-get install -y \
-    git unzip libonig-dev libzip-dev zip \
-    && docker-php-ext-install pdo_mysql mbstring zip \
-    && a2enmod rewrite
+RUN apt-get update && apt-get install -y git unzip libonig-dev libzip-dev zip \
+    && docker-php-ext-install pdo_mysql mbstring zip
 
-# نسخ كل ملفات المشروع أولًا
-COPY . /var/www/html
+# نسخ المشروع
+COPY . /app
 
-# نسخ Composer من صورة Composer الرسمية
+# نسخ Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # تثبيت الاعتماديات PHP
 RUN composer install --optimize-autoloader --no-dev
 
 # ضبط صلاحيات الملفات
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 
 # Cache للـ config و routes و views
 RUN php artisan config:cache
 RUN php artisan route:cache
 RUN php artisan view:cache
 
-EXPOSE 80
+# Expose port
+EXPOSE $PORT
 
-CMD ["apache2-foreground"]
+# تشغيل السيرفر المدمج الخاص بـ Laravel
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=$PORT"]
