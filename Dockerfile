@@ -1,32 +1,33 @@
-# استخدم صورة PHP CLI لأنها مناسبة لـ API
+# استخدم صورة PHP CLI مع الإصدارات المطلوبة
 FROM php:8.2-cli
 
-# مجلد العمل
+# تثبيت الاعتماديات الأساسية
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    && docker-php-ext-install pdo_mysql zip
+
+# تثبيت Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# تعيين مجلد العمل
 WORKDIR /app
 
-# تثبيت الاعتماديات الأساسية
-RUN apt-get update && apt-get install -y git unzip libonig-dev libzip-dev zip \
-    && docker-php-ext-install pdo_mysql mbstring zip
+# نسخ ملفات المشروع إلى الحاوية
+COPY . .
 
-# نسخ ملفات المشروع بالكامل
-COPY . /app
+# تثبيت اعتماديات المشروع
+RUN composer install --no-dev --optimize-autoloader
 
-# نسخ Composer من الصورة الرسمية
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# نسخ ملف البيئة وضبط أذونات التخزين
+RUN cp .env.example .env && php artisan key:generate
+RUN chmod -R 777 storage bootstrap/cache
 
-# تثبيت الاعتماديات بدون حزم التطوير
-RUN composer install --optimize-autoloader --no-dev
+# فتح المنفذ الذي سيعمل عليه API
+EXPOSE 8000
 
-# ضبط صلاحيات الملفات الضرورية
-RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
-
-# عمل Cache للإعدادات والـ Routes والـ Views
-RUN php artisan config:cache
-RUN php artisan route:cache
-RUN php artisan view:cache
-
-# تعريض المنفذ الذي يستخدمه Render
-EXPOSE $PORT
-
-# تشغيل السيرفر مع تحويل PORT إلى عدد صحيح لتجنب الخطأ
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$(($PORT))"]
+# تشغيل الخادم الخاص بـ Laravel (يمكن تغييره لاحقًا إلى سيرفر إنتاج مثل Nginx أو PHP-FPM)
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
