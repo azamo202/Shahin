@@ -79,7 +79,7 @@ class RegisterController extends Controller
                     'business_name' => $request->business_name,
                     'commercial_register' => $request->commercial_register,
                     'national_id' => $request->national_id,
-                    'commercial_register_file' => $request->file('commercial_register_file')->store('files', 'public'),
+                    'commercial_file' => $request->file('commercial_register_file')->store('files', 'public'),
                 ]);
                 break;
             case 5: // وسيط عقاري
