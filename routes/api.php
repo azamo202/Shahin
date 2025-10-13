@@ -12,6 +12,7 @@ use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
 use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\UserMiddleware;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -31,7 +32,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 // تسجيل مستخدم جديد
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-Route::middleware(['auth:sanctum', 'user'])->group(function () {
+Route::middleware(['auth:sanctum', UserMiddleware::class])->group(function () {
     Route::post('/user/change-password', [PasswordController::class, 'change']);
     Route::delete('/user/delete-account', [AccountController::class, 'destroy']);
     Route::put('profile', [ProfileController::class, 'updateProfile']);
