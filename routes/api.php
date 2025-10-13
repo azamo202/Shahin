@@ -30,16 +30,10 @@ Route::post('/email/verification-notification', function (Request $request) {
     return response()->json(['message' => 'تم إرسال رابط التحقق إلى بريدك']);
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-
-
-
-
-
-
 // تسجيل مستخدم جديد
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'user'])->group(function () {
     Route::post('/user/change-password', [PasswordController::class, 'change']);
     Route::delete('/user/delete-account', [AccountController::class, 'destroy']);
     Route::put('profile', [ProfileController::class, 'updateProfile']);
@@ -54,15 +48,13 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AuthAdminController::class, 'login']);       // تسجيل الدخول
 });
 
-Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(function () {
     // إدارة المستخدمين
+Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(function () {
     Route::get('/users', [AdminUserController::class, 'index']); 
     Route::get('/users/approved', [AdminUserController::class, 'approved']); 
     Route::get('/users/pending', [AdminUserController::class, 'pending']); 
     Route::post('/users/{id}/approve', [AdminUserController::class, 'approve']); 
     Route::post('/users/{id}/reject', [AdminUserController::class, 'reject']); 
-
-    // العمليات السابقة
     Route::post('/logout', [AuthAdminController::class, 'logout']);               
     Route::post('/change-password', [AuthAdminController::class, 'changePassword']); 
     Route::get('/profile', [ProfileAdminController::class, 'profile']);          

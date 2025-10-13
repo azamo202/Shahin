@@ -66,12 +66,6 @@ class AuthAdminController extends Controller
                 'status'=>true,
                 'message'=>'تم تسجيل الدخول بنجاح',
                 'data'=>[
-                    'admin'=>[
-                        'id'=>$admin->id,
-                        'full_name'=>$admin->full_name,
-                        'email'=>$admin->email,
-                        'phone'=>$admin->phone,
-                    ],
                     'token'=>$token
                 ]
             ],200);
