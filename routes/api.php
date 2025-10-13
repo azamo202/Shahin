@@ -64,8 +64,15 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 //User
 
 //الأراضي
+// Routes عامة للعقارات (للمسجلين وغير المسجلين)
+Route::prefix('properties')->group(function () {
+    // جلب جميع العقارات المقبولة للواجهة العامة
+    Route::get('/public', [PropertyController::class, 'indexPublic']);
+    Route::get('/public/{id}', [PropertyController::class, 'showPublic']);
+});
+
+// Routes للمستخدمين المسجلين (كما عندك)
 Route::middleware(['auth:sanctum', UserMiddleware::class ])->group(function () {
-    // Routes للعقارات
     Route::prefix('properties')->group(function () {
         Route::get('/', [PropertyController::class, 'index']);
         Route::post('/', [PropertyController::class, 'store']);

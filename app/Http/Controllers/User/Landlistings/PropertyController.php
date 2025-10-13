@@ -11,316 +11,202 @@ use Illuminate\Support\Str;
 
 class PropertyController extends Controller
 {
-    /**     * عرض جميع العقارات المقبولة للمستخدم
-     */
+    /** جلب العقارات للواجهة العامة (الزوار) */
+    public function indexPublic()
+    {
+        $properties = Property::accepted() // فقط العقارات المقبولة
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $this->successResponse($properties, 'تم جلب العقارات بنجاح');
+    }
+
+    /** عرض عقار محدد للواجهة العامة */
+    public function showPublic($id)
+    {
+        $property = Property::accepted()->find($id);
+
+        if (!$property) {
+            return $this->errorResponse('العقار غير موجود', 404);
+        }
+
+        return $this->successResponse($property, 'تم جلب بيانات العقار بنجاح');
+    }
+
+    // رسائل جاهزة
+    private const MSG_NOT_FOUND = 'العقار غير موجود أو لا تملك صلاحية الوصول إليه';
+    private const MSG_UNAUTHORIZED = 'لا يمكن تنفيذ هذا الإجراء على العقار في حالته الحالية';
+
+    /** عرض جميع العقارات المقبولة */
     public function index(Request $request)
     {
-        try {
-            $user = $request->user();
-            $properties = Property::where('user_id', $user->id)
-                ->where('status', 'مقبول') // ✅ عرض العقارات المقبولة فقط
-                ->orderBy('created_at', 'desc')
-                ->get();
+        $user = $request->user();
 
-            return response()->json([
-                'status' => true,
-                'data' => $properties,
-                'message' => 'تم جلب العقارات المقبولة بنجاح'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء جلب العقارات: ' . $e->getMessage()
-            ], 500);
-        }
+        $properties = Property::forUser($user->id)
+            ->accepted()
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $this->successResponse($properties, 'تم جلب العقارات المقبولة بنجاح');
     }
 
-
-    /**
-     * عرض عقار محدد للمستخدم
-     */
+    /** عرض عقار محدد */
     public function show(Request $request, $id)
     {
-        try {
-            $user = $request->user();
-            $property = Property::where('user_id', $user->id)
-                ->where('status', 'مقبول') // ✅ العقار يجب أن يكون مقبول
-                ->find($id);
+        $property = $this->findProperty($request, $id, true);
+        if (!$property) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-            if (!$property) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'العقار غير موجود أو لا تملك صلاحية الوصول إليه'
-                ], 404);
-            }
-
-            return response()->json([
-                'status' => true,
-                'data' => $property,
-                'message' => 'تم جلب بيانات العقار بنجاح'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء جلب بيانات العقار: ' . $e->getMessage()
-            ], 500);
-        }
+        return $this->successResponse($property, 'تم جلب بيانات العقار بنجاح');
     }
 
-    /**
-     * إنشاء عقار جديد
-     */
+    /** إنشاء عقار جديد */
     public function store(PropertyRequest $request)
     {
+        $user = $request->user();
+
         try {
-            $user = $request->user();
+            $images = $this->handleImages($request);
 
-            // معالجة الصور وحفظها
-            $images = [];
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $imageName = 'property_' . Str::random(10) . '_' . time() . '.' . $image->getClientOriginalExtension();
-                    $imagePath = $image->storeAs('properties/images', $imageName, 'public');
-                    $images[] = $imagePath;
-                }
-            }
-
-            // إنشاء العقار
-            $property = Property::create([
+            $property = Property::create(array_merge($request->validated(), [
                 'user_id' => $user->id,
-                'announcement_number' => $request->announcement_number,
-                'region' => $request->region,
-                'city' => $request->city,
-                'title' => $request->title,
-                'land_type' => $request->land_type,
-                'purpose' => $request->purpose,
-                'geo_location_text' => $request->geo_location_text,
-                'geo_location_map' => $request->geo_location_map,
-                'total_area' => $request->total_area,
-                'length_north' => $request->length_north,
-                'length_south' => $request->length_south,
-                'length_east' => $request->length_east,
-                'length_west' => $request->length_west,
-                'description' => $request->description,
-                'deed_number' => $request->deed_number,
                 'images' => $images,
-                'price_per_sqm' => $request->price_per_sqm,
-                'investment_duration' => $request->investment_duration,
-                'estimated_investment_value' => $request->estimated_investment_value,
-                'agency_number' => $request->agency_number,
                 'legal_declaration' => $request->legal_declaration ? 'نعم' : 'لا',
                 'status' => 'قيد المراجعة',
-            ]);
+            ]));
 
-            return response()->json([
-                'status' => true,
-                'data' => $property,
-                'message' => 'تم إنشاء العقار بنجاح وجاري مراجعته'
-            ], 201);
+            return $this->successResponse($property, 'تم إنشاء العقار بنجاح وجاري مراجعته', 201);
         } catch (\Exception $e) {
-            // في حالة الخطأ، حذف الصور التي تم رفعها
-            if (!empty($images)) {
-                foreach ($images as $imagePath) {
-                    Storage::disk('public')->delete($imagePath);
-                }
-            }
-
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء إنشاء العقار: ' . $e->getMessage()
-            ], 500);
+            if (!empty($images)) $this->deleteImages($images);
+            return $this->errorResponse('حدث خطأ أثناء إنشاء العقار: ' . $e->getMessage());
         }
     }
 
-    /**
-     * تحديث عقار موجود
-     */
+    /** تحديث عقار موجود */
     public function update(PropertyRequest $request, $id)
     {
+        $property = $this->findProperty($request, $id);
+        if (!$property) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
+
+        if (in_array($property->status, ['تم البيع', 'مقبول'])) {
+            return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
+        }
+
         try {
-            $user = $request->user();
-            $property = Property::where('user_id', $user->id)->find($id);
+            $images = $this->handleImages($request, $property->images ?? []);
 
-            if (!$property) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'العقار غير موجود أو لا تملك صلاحية التعديل عليه'
-                ], 404);
-            }
-
-            // التحقق من حالة العقار - لا يمكن تعديل عقار تم بيعه أو مقبول
-            if (in_array($property->status, ['تم البيع', 'مقبول'])) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'لا يمكن تعديل العقار في حالته الحالية'
-                ], 403);
-            }
-
-
-            $oldImages = $property->images ?? [];
-            $newImages = [];
-
-            // معالجة الصور الجديدة
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $imageName = 'property_' . Str::random(10) . '_' . time() . '.' . $image->getClientOriginalExtension();
-                    $imagePath = $image->storeAs('properties/images', $imageName, 'public');
-                    $newImages[] = $imagePath;
-                }
-
-                // حذف الصور القديمة
-                foreach ($oldImages as $oldImage) {
-                    Storage::disk('public')->delete($oldImage);
-                }
-            } else {
-                $newImages = $oldImages;
-            }
-
-            // تحديث العقار
-            $property->update([
-                'announcement_number' => $request->announcement_number,
-                'region' => $request->region,
-                'city' => $request->city,
-                'title' => $request->title,
-                'land_type' => $request->land_type,
-                'purpose' => $request->purpose,
-                'geo_location_text' => $request->geo_location_text,
-                'geo_location_map' => $request->geo_location_map,
-                'total_area' => $request->total_area,
-                'length_north' => $request->length_north,
-                'length_south' => $request->length_south,
-                'length_east' => $request->length_east,
-                'length_west' => $request->length_west,
-                'description' => $request->description,
-                'deed_number' => $request->deed_number,
-                'images' => $newImages,
-                'price_per_sqm' => $request->price_per_sqm,
-                'investment_duration' => $request->investment_duration,
-                'estimated_investment_value' => $request->estimated_investment_value,
-                'agency_number' => $request->agency_number,
+            $property->update(array_merge($request->validated(), [
+                'images' => $images,
                 'legal_declaration' => $request->legal_declaration ? 'نعم' : 'لا',
-                'status' => 'قيد المراجعة', // إعادة للحالة قيد المراجعة بعد التعديل
-            ]);
+                'status' => 'قيد المراجعة',
+            ]));
 
-            return response()->json([
-                'status' => true,
-                'data' => $property,
-                'message' => 'تم تحديث العقار بنجاح وجاري مراجعته مرة أخرى'
-            ], 200);
+            return $this->successResponse($property, 'تم تحديث العقار بنجاح وجاري مراجعته');
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء تحديث العقار: ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse('حدث خطأ أثناء تحديث العقار: ' . $e->getMessage());
         }
     }
 
-    /**
-     * حذف عقار
-     */
+    /** حذف عقار */
     public function destroy(Request $request, $id)
     {
-        try {
-            $user = $request->user();
-            $property = Property::where('user_id', $user->id)->find($id);
+        $property = $this->findProperty($request, $id);
+        if (!$property) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-            if (!$property) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'العقار غير موجود أو لا تملك صلاحية الحذف'
-                ], 404);
-            }
-
-            // التحقق من حالة العقار - لا يمكن حذف عقار تم بيعه
-            if ($property->status === 'تم البيع') {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'لا يمكن حذف عقار تم بيعه'
-                ], 403);
-            }
-
-            // حذف الصور المرتبطة
-            if (!empty($property->images)) {
-                foreach ($property->images as $image) {
-                    Storage::disk('public')->delete($image);
-                }
-            }
-
-            $property->delete();
-
-            return response()->json([
-                'status' => true,
-                'message' => 'تم حذف العقار بنجاح'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء حذف العقار: ' . $e->getMessage()
-            ], 500);
+        if ($property->status === 'تم البيع') {
+            return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
         }
+
+        $this->deleteImages($property->images ?? []);
+        $property->delete();
+
+        return $this->successResponse(null, 'تم حذف العقار بنجاح');
     }
 
-    /**
-     * عرض عقارات المستخدم حسب الحالة
-     */
+    /** جلب العقارات حسب الحالة */
     public function getByStatus(Request $request, $status)
     {
-        try {
-            $user = $request->user();
+        $allowedStatuses = ['قيد المراجعة', 'مقبول', 'مرفوض', 'تم البيع'];
+        if (!in_array($status, $allowedStatuses)) {
+            return $this->errorResponse('حالة غير صحيحة', 400);
+        }
 
-            // التحقق من أن الحالة مدعومة
-            $allowedStatuses = ['قيد المراجعة', 'مقبول', 'مرفوض', 'تم البيع'];
-            if (!in_array($status, $allowedStatuses)) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'حالة غير صحيحة'
-                ], 400);
+        $user = $request->user();
+        $properties = Property::forUser($user->id)
+            ->withStatus($status)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $this->successResponse($properties, "تم جلب العقارات ذات الحالة: {$status}");
+    }
+
+    /** إحصائيات العقارات */
+    public function getStats(Request $request)
+    {
+        $user = $request->user();
+        $stats = [
+            'total' => Property::forUser($user->id)->count(),
+            'under_review' => Property::forUser($user->id)->withStatus('قيد المراجعة')->count(),
+            'approved' => Property::forUser($user->id)->withStatus('مقبول')->count(),
+            'rejected' => Property::forUser($user->id)->withStatus('مرفوض')->count(),
+            'sold' => Property::forUser($user->id)->withStatus('تم البيع')->count(),
+        ];
+
+        return $this->successResponse($stats, 'تم جلب الإحصائيات بنجاح');
+    }
+
+    // -------------------- دوال مساعدة --------------------
+
+    /** جلب العقار مع التحقق من الملكية والحالة */
+    private function findProperty(Request $request, $id, $mustBeAccepted = false)
+    {
+        $query = Property::forUser($request->user()->id)->where('id', $id);
+        if ($mustBeAccepted) $query->accepted();
+        return $query->first();
+    }
+
+    /** معالجة الصور */
+    private function handleImages(Request $request, array $oldImages = [])
+    {
+        $images = $oldImages;
+
+        if ($request->hasFile('images')) {
+            // حذف الصور القديمة إذا كانت موجودة
+            if (!empty($oldImages)) $this->deleteImages($oldImages);
+
+            $images = [];
+            foreach ($request->file('images') as $image) {
+                $imageName = 'property_' . Str::random(10) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $images[] = $image->storeAs('properties/images', $imageName, 'public');
             }
+        }
 
-            $properties = Property::where('user_id', $user->id)
-                ->where('status', $status)
-                ->orderBy('created_at', 'desc')
-                ->get();
+        return $images;
+    }
 
-            return response()->json([
-                'status' => true,
-                'data' => $properties,
-                'message' => "تم جلب العقارات ذات الحالة: {$status}"
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء جلب العقارات: ' . $e->getMessage()
-            ], 500);
+    /** حذف الصور */
+    private function deleteImages(array $images)
+    {
+        foreach ($images as $image) {
+            Storage::disk('public')->delete($image);
         }
     }
 
-    /**
-     * إحصائيات عقارات المستخدم
-     */
-    public function getStats(Request $request)
+    /** رد JSON للنجاح */
+    private function successResponse($data, $message = '', $code = 200)
     {
-        try {
-            $user = $request->user();
+        return response()->json([
+            'status' => true,
+            'data' => $data,
+            'message' => $message
+        ], $code);
+    }
 
-            $stats = [
-                'total' => Property::where('user_id', $user->id)->count(),
-                'under_review' => Property::where('user_id', $user->id)->where('status', 'قيد المراجعة')->count(),
-                'approved' => Property::where('user_id', $user->id)->where('status', 'مقبول')->count(),
-                'rejected' => Property::where('user_id', $user->id)->where('status', 'مرفوض')->count(),
-                'sold' => Property::where('user_id', $user->id)->where('status', 'تم البيع')->count(),
-            ];
-
-            return response()->json([
-                'status' => true,
-                'data' => $stats,
-                'message' => 'تم جلب الإحصائيات بنجاح'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'حدث خطأ أثناء جلب الإحصائيات: ' . $e->getMessage()
-            ], 500);
-        }
+    /** رد JSON للخطأ */
+    private function errorResponse($message, $code = 500)
+    {
+        return response()->json([
+            'status' => false,
+            'message' => $message
+        ], $code);
     }
 }
