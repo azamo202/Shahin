@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User\Landlistings;
 
 use App\Http\Controllers\Controller;
 use App\Models\Property;
-use App\Http\Requests\PropertyRequest;
+use App\Http\Requests\User\Landlistings\PropertyRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
