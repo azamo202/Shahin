@@ -76,7 +76,7 @@ class RegisterController extends Controller
                 break;
             case 4: // منشأة تجارية
                 $user->businessEntity()->create([
-                    'entity_name' => $request->entity_name,
+                    'business_name' => $request->entity_name,
                     'commercial_register' => $request->commercial_register,
                     'national_id' => $request->national_id,
                     'commercial_register_file' => $request->file('commercial_register_file')->store('files', 'public'),

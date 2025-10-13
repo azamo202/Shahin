@@ -86,7 +86,7 @@ class RegisterRequest extends FormRequest
 
             case 4: // business_entities
                 $rules = array_merge($rules, [
-                    'entity_name' => 'required_if:user_type_id,4|string|max:150',
+                    'business_name' => 'required_if:user_type_id,4|string|max:150',
                     'commercial_register' => [
                         'required_if:user_type_id,4',
                         'string',
