@@ -9,51 +9,33 @@ class Property extends Model
 {
     use HasFactory;
 
-    // اسم الجدول (اختياري إذا استخدمنا الاسم الافتراضي "properties")
-    protected $table = 'properties';
-
-    // الحقول القابلة للتعبئة جماعياً
     protected $fillable = [
-        'user_id',
-        'announcement_number',
-        'region',
-        'city',
-        'title',
-        'land_type',
-        'purpose',
-        'geo_location_text',
-        'geo_location_map',
-        'total_area',
-        'length_north',
-        'length_south',
-        'length_east',
-        'length_west',
-        'description',
-        'deed_number',
-        'images',                    // يخزن كـ JSON
-        'price_per_sqm',
-        'investment_duration',
-        'estimated_investment_value',
-        'agency_number',
-        'legal_declaration',
-        'status',
+        'user_id', 'announcement_number', 'region', 'city', 'title', 'land_type',
+        'purpose', 'geo_location_text', 'geo_location_map', 'total_area',
+        'length_north', 'length_south', 'length_east', 'length_west',
+        'description', 'deed_number', 'images', 'price_per_sqm', 'investment_duration',
+        'estimated_investment_value', 'agency_number', 'legal_declaration', 'status'
     ];
 
-    // تحويل الحقول المناسبة تلقائياً
     protected $casts = [
-        'images' => 'array',         // يحول JSON إلى مصفوفة تلقائياً
-        'total_area' => 'float',
-        'length_north' => 'float',
-        'length_south' => 'float',
-        'length_east' => 'float',
-        'length_west' => 'float',
-        'price_per_sqm' => 'float',
-        'estimated_investment_value' => 'float',
+        'images' => 'array'
     ];
 
-    // العلاقة مع المستخدم (كل عرض ينتمي لمستخدم واحد)
-    public function user()
+    // Scope لجلب العقارات الخاصة بالمستخدم
+    public function scopeForUser($query, $userId)
     {
-        return $this->belongsTo(User::class);
+        return $query->where('user_id', $userId);
+    }
+
+    // Scope للعقارات المقبولة
+    public function scopeAccepted($query)
+    {
+        return $query->where('status', 'مقبول');
+    }
+
+    // Scope حسب الحالة
+    public function scopeWithStatus($query, $status)
+    {
+        return $query->where('status', $status);
     }
 }
