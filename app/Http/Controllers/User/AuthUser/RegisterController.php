@@ -91,7 +91,7 @@ class RegisterController extends Controller
                 break;
             case 6: // شركة مزاد
                 $user->auctionCompany()->create([
-                    'entity_name' => $request->entity_name,
+                    'entity_name' => $request->auction_name,
                     'national_id' => $request->national_id,
                     'commercial_register_file' => $request->file('commercial_register_file')->store('files', 'public'),
                     'license_number' => $request->license_number,
