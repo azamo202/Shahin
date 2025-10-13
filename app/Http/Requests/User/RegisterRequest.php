@@ -158,8 +158,8 @@ class RegisterRequest extends FormRequest
             'agency_number.max' => 'رقم الوكالة طويل جداً',
             'agency_number.unique' => 'رقم الوكالة مستخدم من قبل',
 
-            'entity_name.required_if' => 'اسم المنشأة/الشركة مطلوب',
-            'entity_name.max' => 'اسم المنشأة طويل جداً',
+            'business_name.required_if' => 'اسم المنشأة/الشركة مطلوب',
+            'business_name.max' => 'اسم المنشأة طويل جداً',
 
             'commercial_register.required_if' => 'رقم السجل التجاري مطلوب',
             'commercial_register.unique' => 'رقم السجل التجاري مستخدم من قبل',
