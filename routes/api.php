@@ -11,6 +11,7 @@ use App\Http\Controllers\User\AuthUser\AuthController;
 use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
+use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 
@@ -63,3 +64,15 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 //User
 
 //الأراضي
+Route::middleware(['auth:sanctum', UserMiddleware::class ])->group(function () {
+    // Routes للعقارات
+    Route::prefix('properties')->group(function () {
+        Route::get('/', [PropertyController::class, 'index']);
+        Route::post('/', [PropertyController::class, 'store']);
+        Route::get('/stats', [PropertyController::class, 'getStats']);
+        Route::get('/status/{status}', [PropertyController::class, 'getByStatus']);
+        Route::get('/{id}', [PropertyController::class, 'show']);
+        Route::put('/{id}', [PropertyController::class, 'update']);
+        Route::delete('/{id}', [PropertyController::class, 'destroy']);
+    });
+});
