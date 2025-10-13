@@ -12,7 +12,7 @@ use Illuminate\Http\Response;
 
 class RegisterController extends Controller
 {
- public function register(RegisterRequest $request): JsonResponse
+    public function register(RegisterRequest $request): JsonResponse
     {
         try {
             DB::beginTransaction();
@@ -44,11 +44,10 @@ class RegisterController extends Controller
                     'status' => $user->status,
                 ]
             ], Response::HTTP_CREATED);
-
         } catch (\Exception $e) {
             DB::rollBack();
-            
-           
+
+
 
             return response()->json([
                 'message' => 'حدث خطأ أثناء إنشاء الحساب',
@@ -91,14 +90,15 @@ class RegisterController extends Controller
                 break;
             case 6: // شركة مزاد
                 $user->auctionCompany()->create([
-                    'entity_name' => $request->auction_name,
+                    'auction_name' => $request->auction_name,
                     'national_id' => $request->national_id,
-                    'commercial_register_file' => $request->file('commercial_register_file')->store('files', 'public'),
+                    'commercial_register' => $request->commercial_register,
+                    'commercial_file' => $request->file('commercial_register_file')->store('files', 'public'),
                     'license_number' => $request->license_number,
                     'license_file' => $request->file('license_file')->store('files', 'public'),
                 ]);
+
                 break;
         }
     }
-    
 }

@@ -4,8 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthAdmin\ProfileAdminController;
 use App\Http\Controllers\Admin\AuthAdmin\AuthAdminController;
-use App\Http\Controllers\User\Landlistings\LandListingController;
-use App\Http\Controllers\User\Landlistings\UserLandListingController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\User\AuthUser\PasswordController;
 use App\Http\Controllers\User\AuthUser\AccountController;
@@ -64,22 +62,3 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 //User
 
 //الأراضي
-// Routes العامة (لجميع المستخدمين)
-Route::prefix('land-listings')->group(function () {
-    Route::get('/', [LandListingController::class, 'index']);
-    Route::get('/{id}', [LandListingController::class, 'show']);
-});
-
-// Routes المحمية (تتطلب توكن)
-Route::middleware('auth:sanctum')->prefix('land-listings')->group(function () {
-    // إدارة قوائم الأراضي
-    Route::post('/', [LandListingController::class, 'store']);
-    Route::put('/{id}', [LandListingController::class, 'update']);
-    Route::delete('/{id}', [LandListingController::class, 'destroy']);
-
-    // قوائم الأراضي الخاصة بالمستخدم
-    Route::prefix('my-listings')->group(function () {
-        Route::get('/', [UserLandListingController::class, 'index']);
-        Route::get('/statistics', [UserLandListingController::class, 'statistics']);
-    });
-});

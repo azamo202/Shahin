@@ -26,10 +26,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'الحساب قيد المراجعة. يرجى الانتظار حتى الموافقة عليه.'], Response::HTTP_FORBIDDEN);
         }
 
-        if ($user->isRejected() || $user->isInactive()) {
-            return response()->json(['message' => 'الحساب غير مفعل. يرجى التواصل مع الإدارة.'], Response::HTTP_FORBIDDEN);
-        }
-
         if (!$user->hasVerifiedEmail()) {
             return response()->json(['message' => 'يرجى التحقق من بريدك الإلكتروني أولاً'], Response::HTTP_FORBIDDEN);
         }
