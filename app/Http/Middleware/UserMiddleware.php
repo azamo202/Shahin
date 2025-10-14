@@ -11,34 +11,44 @@ class UserMiddleware
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next): Response
-    {
-        // تحقق من تسجيل الدخول
-        $user = $request->user();
+   public function handle(Request $request, Closure $next): Response
+{
+    $user = $request->user();
 
-        if (!$user) {
-            return response()->json([
-                'status' => false,
-                'message' => 'يجب تسجيل الدخول أولاً'
-            ], 401);
-        }
-
-        // تحقق أن هذا المستخدم ليس Admin
-        if ($user instanceof \App\Models\Admin) {
-            return response()->json([
-                'status' => false,
-                'message' => 'غير مصرح لك بالدخول هنا'
-            ], 403);
-        }
-
-        // تحقق من حالة المستخدم
-        if ($user->status !== 'approved') {
-            return response()->json([
-                'status' => false,
-                'message' => 'حسابك غير مفعل بعد'
-            ], 403);
-        }
-
-        return $next($request);
+    // 1. التحقق من تسجيل الدخول
+    if (!$user) {
+        return response()->json([
+            'status' => false,
+            'message' => 'يجب تسجيل الدخول أولاً'
+        ], 401);
     }
+
+    // 2. منع دخول الأدمن
+    if ($user instanceof \App\Models\Admin) {
+        return response()->json([
+            'status' => false,
+            'message' => 'غير مصرح لك بالدخول هنا'
+        ], 403);
+    }
+
+    // 3. التحقق من تفعيل الحساب
+    if ($user->status !== 'approved') {
+        return response()->json([
+            'status' => false,
+            'message' => 'حسابك غير مفعل بعد'
+        ], 403);
+    }
+
+    // 4. التحقق من نوع المستخدم (الصلاحية)
+    $allowedRoles = [2, 3, 4, 5]; // عدلها حسب أرقامك الفعلية
+
+    if (!in_array($user->type, $allowedRoles)) {
+        return response()->json([
+            'status' => false,
+            'message' => 'ليس لديك صلاحية للوصول'
+        ], 403);
+    }
+
+    return $next($request);
+}
 }

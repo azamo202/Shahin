@@ -72,7 +72,7 @@ Route::prefix('properties')->group(function () {
 });
 
 // Routes للمستخدمين المسجلين (كما عندك)
-Route::middleware(['auth:sanctum', UserMiddleware::class ])->group(function () {
+Route::middleware(['auth:sanctum', UserMiddleware::class])->group(function () {
     Route::prefix('properties')->group(function () {
         Route::get('/', [PropertyController::class, 'index']);
         Route::post('/', [PropertyController::class, 'store']);

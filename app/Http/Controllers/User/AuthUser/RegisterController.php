@@ -23,8 +23,12 @@ class RegisterController extends Controller
                 'password' => Hash::make($request->password),
                 'phone' => $request->phone,
                 'user_type_id' => $request->user_type_id,
-                'status' => User::STATUS_PENDING,
+                'status' => in_array($request->user_type_id, [1, 2])
+                    ? User::STATUS_APPROVED
+                    : User::STATUS_PENDING,
             ]);
+
+
 
             // إنشاء البيانات الإضافية بناءً على نوع المستخدم
             $this->createUserSpecificData($user, $request);
@@ -35,12 +39,14 @@ class RegisterController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني وانتظار موافقة الإدارة.',
+                'message' => in_array($request->user_type_id, [1, 2])
+                    ? 'تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني.'
+                    : 'تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني وانتظار موافقة الإدارة.',
+
                 'user' => [
                     'id' => $user->id,
                     'full_name' => $user->full_name,
                     'email' => $user->email,
-                    'phone' => $user->phone,
                     'status' => $user->status,
                 ]
             ], Response::HTTP_CREATED);
