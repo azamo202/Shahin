@@ -65,21 +65,49 @@ class PropertyController extends Controller
         $user = $request->user();
 
         try {
-            $images = $this->handleImages($request);
+            // 1️⃣ إنشاء العقار بدون الصور أولاً
+            $property = Property::create(array_merge(
+                $request->validated(),
+                [
+                    'user_id' => $user->id,
+                    'cover_image' => $request->file('cover_image')
+                        ? $request->file('cover_image')->store('properties/cover', 'public')
+                        : null,
+                    'legal_declaration' => $request->legal_declaration ? 'نعم' : 'لا',
+                    'status' => 'قيد المراجعة',
+                ]
+            ));
 
-            $property = Property::create(array_merge($request->validated(), [
-                'user_id' => $user->id,
-                'images' => $images,
-                'legal_declaration' => $request->legal_declaration ? 'نعم' : 'لا',
-                'status' => 'قيد المراجعة',
-            ]));
+            // 2️⃣ رفع الصور الإضافية (إن وجدت) إلى جدول property_images
+            if ($request->has('images')) {
+                foreach ($request->file('images') as $image) {
+                    $property->images()->create([
+                        'image_path' => $image->store('properties/images', 'public'),
+                    ]);
+                }
+            }
 
             return $this->successResponse($property, 'تم إنشاء العقار بنجاح وجاري مراجعته', 201);
         } catch (\Exception $e) {
-            if (!empty($images)) $this->deleteImages($images);
+            // حذف صورة الغلاف إذا حصل خطأ
+            // حذف صورة الغلاف إذا حصل خطأ
+            if (isset($property) && $property->cover_image) {
+                Storage::disk('public')->delete($property->cover_image);
+            }
+
+            // حذف الصور الإضافية إذا حصل خطأ
+            if (isset($property) && $property->images) {
+                foreach ($property->images as $img) {
+                    Storage::disk('public')->delete($img->image_path);
+                    $img->delete();
+                }
+            }
+
+
             return $this->errorResponse('حدث خطأ أثناء إنشاء العقار: ' . $e->getMessage());
         }
     }
+
 
     /** تحديث عقار موجود */
     public function update(PropertyRequest $request, $id)
