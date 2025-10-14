@@ -24,7 +24,8 @@ class PropertyController extends Controller
     /** عرض عقار محدد للواجهة العامة */
     public function showPublic($id)
     {
-        $property = Property::accepted()->find($id);
+        // جلب العقار مع الصور
+        $property = Property::accepted()->with('images')->find($id);
 
         if (!$property) {
             return $this->errorResponse('العقار غير موجود', 404);
@@ -32,6 +33,7 @@ class PropertyController extends Controller
 
         return $this->successResponse($property, 'تم جلب بيانات العقار بنجاح');
     }
+
 
     // رسائل جاهزة
     private const MSG_NOT_FOUND = 'العقار غير موجود أو لا تملك صلاحية الوصول إليه';
