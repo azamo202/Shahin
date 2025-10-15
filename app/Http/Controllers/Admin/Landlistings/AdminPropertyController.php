@@ -41,7 +41,7 @@ class AdminPropertyController extends Controller
     {
         try {
             $property = Property::with([
-                'user:id,name,email,phone', 
+                'user:id,full_name,email,phone', 
                 'images'
             ])->find($id);
 
