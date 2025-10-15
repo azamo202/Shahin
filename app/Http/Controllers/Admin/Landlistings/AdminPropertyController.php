@@ -121,7 +121,7 @@ class AdminPropertyController extends Controller
     public function getPendingProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user:id,first_name,last_name,email,phone', 'images'])
+            $properties = Property::with(['user:id,full_name,email,phone', 'images'])
                 ->where('status', 'قيد المراجعة')
                 ->withFilters($this->prepareFilters($request))
                 ->latest()
@@ -146,7 +146,7 @@ class AdminPropertyController extends Controller
     public function getSoldProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user:id,first_name,last_name,email,phone', 'images'])
+            $properties = Property::with(['user:id,full_name,email,phone', 'images'])
                 ->where('status', 'تم البيع')
                 ->withFilters($this->prepareFilters($request))
                 ->latest()

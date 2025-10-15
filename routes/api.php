@@ -72,6 +72,7 @@ Route::prefix('admin/properties')->middleware('auth:sanctum')->group(function ()
     Route::get('/accepted', [AdminPropertyController::class, 'getAcceptedProperties']);
     Route::get('/rejected', [AdminPropertyController::class, 'getRejectedProperties']);
     Route::get('/pending', [AdminPropertyController::class, 'getPendingProperties']);
+    Route::get('/sold', [AdminPropertyController::class, 'getSoldProperties']);
     Route::get('/stats', [AdminPropertyController::class, 'getPropertiesStats']);
     Route::get('/{id}', [AdminPropertyController::class, 'getProperty']); // آخر شيء
 });
