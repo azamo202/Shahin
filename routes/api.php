@@ -12,6 +12,7 @@ use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
+use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\CheckUserRole;
@@ -74,6 +75,12 @@ Route::prefix('admin/properties')->middleware('auth:sanctum')->group(function ()
     Route::get('/pending', [AdminPropertyController::class, 'getPendingProperties']);
     Route::get('/sold', [AdminPropertyController::class, 'getSoldProperties']);
     Route::get('/stats', [AdminPropertyController::class, 'getPropertiesStats']);
+    Route::put('/{id}/approve', [AdminPropertyStatusController::class, 'approveProperty']);
+    // رفض الأرض او قبولها او تغيير حالتها
+    Route::put('/{id}/reject', [AdminPropertyStatusController::class, 'rejectProperty']);
+    Route::put('/{id}/mark-sold', [AdminPropertyStatusController::class, 'markAsSold']);
+    Route::put('/{id}/return-pending', [AdminPropertyStatusController::class, 'returnToPending']);
+    Route::put('/{id}/change-status', [AdminPropertyStatusController::class, 'changePropertyStatus']);
     Route::get('/{id}', [AdminPropertyController::class, 'getProperty']); // آخر شيء
 });
 
@@ -86,7 +93,6 @@ Route::prefix('properties')->group(function () {
     Route::get('/', [PublicPropertyController::class, 'index']);
     Route::get('/{id}', [PublicPropertyController::class, 'show']);
     Route::get('/filter-options', [PublicPropertyController::class, 'getFilterOptions']);
-
 });
 
 // ✅ User Routes (Requires Auth)
