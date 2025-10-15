@@ -23,15 +23,15 @@ class CheckUserRole
             ], 401);
         }
 
-        // لو لم يتم تمرير أي أدوار، اسمح للجميع (أو ممكن تمنع حسب رغبتك)
+        // لو لم يتم تمرير أي أدوار، اسمح للجميع
         if (empty($roles)) {
             return $next($request);
         }
 
-        // جلب IDs للأدوار المطلوبة من جدول user_types
+        // جلب IDs للأدوار المطلوبة
         $allowedRoleIds = UserType::whereIn('type_name', $roles)
-                                  ->pluck('id')
-                                  ->toArray();
+            ->pluck('id')
+            ->toArray();
 
         // التحقق من دور المستخدم
         if (!in_array($user->user_type_id, $allowedRoleIds)) {
@@ -41,7 +41,6 @@ class CheckUserRole
             ], 403);
         }
 
-        // السماح بالمرور إذا كل شيء صحيح
         return $next($request);
     }
 }
