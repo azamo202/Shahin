@@ -14,7 +14,7 @@ class PropertyRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
+        $rules = [
             // بيانات أساسية
             'announcement_number' => 'required|string|max:50',
             'region' => 'required|string|max:100',
@@ -36,29 +36,31 @@ class PropertyRequest extends FormRequest
             'description' => 'required|string',
             'deed_number' => 'required|string|max:50',
 
-            // الصور
-            'cover_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120', // صورة الغلاف
-            'images' => 'nullable|array', // الصور الإضافية
+            // الصور الإضافية
+            'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120',
 
-            // الأسعار والاستثمار حسب الغرض
+            // الأسعار والاستثمار
             'price_per_sqm' => 'required_if:purpose,بيع|nullable|numeric|min:0',
             'investment_duration' => 'required_if:purpose,استثمار|nullable|integer|min:1',
             'estimated_investment_value' => 'required_if:purpose,استثمار|nullable|numeric|min:0',
 
             // الوكالة والتعهد
             'agency_number' => 'required_if:user_type,3|nullable|string|max:50',
-            'legal_declaration' => 'accepted',
         ];
-    }
 
-    public function prepareForValidation()
-    {
-        $this->merge([
-            'announcement_number' => trim($this->announcement_number),
-            'title' => trim($this->title),
-            'deed_number' => trim($this->deed_number),
-            'agency_number' => $this->agency_number ? trim($this->agency_number) : null,
-        ]);
+        // ✅ إذا كان إنشاء (POST) → صورة الغلاف مطلوبة + التعهد مطلوب
+        if ($this->isMethod('post')) {
+            $rules['cover_image'] = 'required|image|mimes:jpeg,png,jpg,gif|max:5120';
+            $rules['legal_declaration'] = 'accepted';
+        }
+
+        // ✅ إذا كان تعديل (PUT/PATCH) → الغلاف اختياري + التعهد اختياري
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
+            $rules['cover_image'] = 'nullable|image|mimes:jpeg,png,jpg,gif|max:5120';
+            $rules['legal_declaration'] = 'sometimes|accepted';
+        }
+
+        return $rules;
     }
 }
