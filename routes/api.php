@@ -67,13 +67,13 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 
 
 //إدراة الأراضي
-Route::prefix('admin/properties')->group(function () {
+Route::prefix('admin/properties')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [AdminPropertyController::class, 'getAllProperties']);
-    Route::get('/{id}', [AdminPropertyController::class, 'getProperty']); // الجديد
     Route::get('/accepted', [AdminPropertyController::class, 'getAcceptedProperties']);
     Route::get('/rejected', [AdminPropertyController::class, 'getRejectedProperties']);
     Route::get('/pending', [AdminPropertyController::class, 'getPendingProperties']);
     Route::get('/stats', [AdminPropertyController::class, 'getPropertiesStats']);
+    Route::get('/{id}', [AdminPropertyController::class, 'getProperty']); // آخر شيء
 });
 
 //User
