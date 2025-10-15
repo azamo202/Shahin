@@ -71,6 +71,8 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 Route::prefix('properties')->group(function () {
     Route::get('/', [PublicPropertyController::class, 'index']);
     Route::get('/{id}', [PublicPropertyController::class, 'show']);
+    Route::get('/filter-options', [PublicPropertyController::class, 'getFilterOptions']);
+
 });
 
 // ✅ User Routes (Requires Auth)
