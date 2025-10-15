@@ -78,9 +78,8 @@ Route::middleware([
     \App\Http\Middleware\UserMiddleware::class,
     'check.user.role:مالك أرض,وسيط عقاري,جهة تجارية,وكيل قانوني'
 ])->group(function () {
-    Route::prefix('properties')->group(function () {
-        Route::apiResource('properties', PropertyController::class);
-        Route::get('properties/stats', [PropertyController::class, 'getStats']);
-        Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
-    });
+    // لا نحتاج prefix هنا
+    Route::apiResource('properties', PropertyController::class);
+    Route::get('properties/stats', [PropertyController::class, 'getStats']);
+    Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
 });
