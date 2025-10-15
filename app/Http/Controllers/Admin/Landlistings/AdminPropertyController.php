@@ -68,26 +68,24 @@ class AdminPropertyController extends Controller
     /**
      * جلب الأراضي المقبولة
      */
-    /**
-     * جلب الأراضي المفتوحة (كانت مقبولة سابقًا)
-     */
-    public function getOpenProperties(Request $request): JsonResponse
+    public function getAcceptedProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user'])
-                ->where('status', 'مفتوح')
+            $properties = Property::with(['user:id,full_name,email,phone', 'images'])
+                ->where('status', 'مفتوح') // تم التعديل من 'مقبول' إلى 'مفتوح'
+                ->withFilters($this->prepareFilters($request))
                 ->latest()
                 ->paginate(15);
 
             return response()->json([
                 'success' => true,
                 'data' => $properties,
-                'message' => 'تم جلب الأراضي المفتوحة بنجاح'
+                'message' => 'تم جلب الأراضي المقبولة بنجاح'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ أثناء جلب الأراضي المفتوحة: ' . $e->getMessage()
+                'message' => 'حدث خطأ أثناء جلب الأراضي المقبولة: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -98,8 +96,9 @@ class AdminPropertyController extends Controller
     public function getRejectedProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user'])
+            $properties = Property::with(['user:id,full_name,email,phone', 'images'])
                 ->where('status', 'مرفوض')
+                ->withFilters($this->prepareFilters($request))
                 ->latest()
                 ->paginate(15);
 
@@ -116,15 +115,14 @@ class AdminPropertyController extends Controller
         }
     }
 
-
     /**
-     * جلب الأراضي قيد المعالجة
+     * جلب الأراضي قيد المراجعة
      */
     public function getPendingProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user', 'images'])
-                ->withStatus('قيد المراجعة')
+            $properties = Property::with(['user:id,first_name,last_name,email,phone', 'images'])
+                ->where('status', 'قيد المراجعة')
                 ->withFilters($this->prepareFilters($request))
                 ->latest()
                 ->paginate(15);
@@ -132,16 +130,40 @@ class AdminPropertyController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $properties,
-                'message' => 'تم جلب الأراضي قيد المعالجة بنجاح'
+                'message' => 'تم جلب الأراضي قيد المراجعة بنجاح'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ أثناء جلب الأراضي قيد المعالجة: ' . $e->getMessage()
+                'message' => 'حدث خطأ أثناء جلب الأراضي قيد المراجعة: ' . $e->getMessage()
             ], 500);
         }
     }
 
+    /**
+     * جلب الأراضي المباعة
+     */
+    public function getSoldProperties(Request $request): JsonResponse
+    {
+        try {
+            $properties = Property::with(['user:id,first_name,last_name,email,phone', 'images'])
+                ->where('status', 'تم البيع')
+                ->withFilters($this->prepareFilters($request))
+                ->latest()
+                ->paginate(15);
+
+            return response()->json([
+                'success' => true,
+                'data' => $properties,
+                'message' => 'تم جلب الأراضي المباعة بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب الأراضي المباعة: ' . $e->getMessage()
+            ], 500);
+        }
+    }
     /**
      * إعداد الفلاتر من الطلب
      */
