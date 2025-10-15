@@ -68,21 +68,25 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 
 
 //إدراة الأراضي
-Route::prefix('admin/properties')->middleware('auth:sanctum')->group(function () {
+//إدراة الأراضي للأدمن
+Route::prefix('admin/properties')->middleware(['auth:sanctum', IsAdmin::class])->group(function () {
     Route::get('/', [AdminPropertyController::class, 'getAllProperties']);
     Route::get('/accepted', [AdminPropertyController::class, 'getAcceptedProperties']);
     Route::get('/rejected', [AdminPropertyController::class, 'getRejectedProperties']);
     Route::get('/pending', [AdminPropertyController::class, 'getPendingProperties']);
     Route::get('/sold', [AdminPropertyController::class, 'getSoldProperties']);
     Route::get('/stats', [AdminPropertyController::class, 'getPropertiesStats']);
+
+    // حالات العقار
     Route::put('/{id}/approve', [AdminPropertyStatusController::class, 'approveProperty']);
-    // رفض الأرض او قبولها او تغيير حالتها
     Route::put('/{id}/reject', [AdminPropertyStatusController::class, 'rejectProperty']);
     Route::put('/{id}/mark-sold', [AdminPropertyStatusController::class, 'markAsSold']);
     Route::put('/{id}/return-pending', [AdminPropertyStatusController::class, 'returnToPending']);
     Route::put('/{id}/change-status', [AdminPropertyStatusController::class, 'changePropertyStatus']);
-    Route::get('/{id}', [AdminPropertyController::class, 'getProperty']); // آخر شيء
+
+    Route::get('/{id}', [AdminPropertyController::class, 'getProperty']);
 });
+
 
 //User
 
