@@ -76,6 +76,7 @@ Route::prefix('properties')->group(function () {
 Route::middleware([
     'auth:sanctum',
     \App\Http\Middleware\UserMiddleware::class,
+    \App\Http\Middleware\CheckUserRole::class,
     'check.user.role:مالك أرض,وسيط عقاري,جهة تجارية,وكيل قانوني'
 ])->group(function () {
     // لا نحتاج prefix هنا
