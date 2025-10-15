@@ -14,10 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function ($middleware): void {
-        // Middleware عالمي
-        $middleware->append([
-            UserMiddleware::class,  // فعال لكل طلب
-        ]);
 
         // Middleware بالاسم للاستخدام مع parameters
         $middleware->alias([
