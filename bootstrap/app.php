@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Middleware\CheckUserRole;
-use App\Http\Middleware\UserMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,11 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function ($middleware): void {
-
-        // Middleware بالاسم للاستخدام مع parameters
-        $middleware->alias([
-            'check.user.role' => CheckUserRole::class,
-        ]);
+    ->withMiddleware(function (Middleware $middleware): void {
+        //
     })
-    ->create();
+    ->withExceptions(function (Exceptions $exceptions): void {
+        //
+    })->create();

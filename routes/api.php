@@ -75,10 +75,9 @@ Route::prefix('properties')->group(function () {
 // Routes للمستخدمين المسجلين (كما عندك)
 Route::middleware([
     'auth:sanctum',
-    'check.user.role:مالك أرض,وسيط عقاري,جهة تجارية,وكيل قانوني'
+    CheckUserRole::class . ':مالك أرض,وسيط عقاري,جهة تجارية,وكيل قانوني'
 ])->group(function () {
     Route::apiResource('properties', PropertyController::class);
     Route::get('properties/stats', [PropertyController::class, 'getStats']);
     Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
 });
-
