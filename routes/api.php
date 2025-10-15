@@ -75,12 +75,10 @@ Route::prefix('properties')->group(function () {
 // Routes للمستخدمين المسجلين (كما عندك)
 Route::middleware([
     'auth:sanctum',
-    \App\Http\Middleware\UserMiddleware::class,
-    \App\Http\Middleware\CheckUserRole::class,
     'check.user.role:مالك أرض,وسيط عقاري,جهة تجارية,وكيل قانوني'
 ])->group(function () {
-    // لا نحتاج prefix هنا
     Route::apiResource('properties', PropertyController::class);
     Route::get('properties/stats', [PropertyController::class, 'getStats']);
     Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
 });
+
