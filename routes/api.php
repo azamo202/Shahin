@@ -49,18 +49,18 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AuthAdminController::class, 'login']);       // تسجيل الدخول
 });
 
-    // إدارة المستخدمين
+// إدارة المستخدمين
 Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(function () {
-    Route::get('/users', [AdminUserController::class, 'index']); 
-    Route::get('/users/approved', [AdminUserController::class, 'approved']); 
-    Route::get('/users/pending', [AdminUserController::class, 'pending']); 
-    Route::post('/users/{id}/approve', [AdminUserController::class, 'approve']); 
-    Route::post('/users/{id}/reject', [AdminUserController::class, 'reject']); 
-    Route::post('/logout', [AuthAdminController::class, 'logout']);               
-    Route::post('/change-password', [AuthAdminController::class, 'changePassword']); 
-    Route::get('/profile', [ProfileAdminController::class, 'profile']);          
-    Route::put('/profile', [ProfileAdminController::class, 'updateProfile']);   
-    Route::delete('/delete-account', [ProfileAdminController::class, 'deleteAccount']); 
+    Route::get('/users', [AdminUserController::class, 'index']);
+    Route::get('/users/approved', [AdminUserController::class, 'approved']);
+    Route::get('/users/pending', [AdminUserController::class, 'pending']);
+    Route::post('/users/{id}/approve', [AdminUserController::class, 'approve']);
+    Route::post('/users/{id}/reject', [AdminUserController::class, 'reject']);
+    Route::post('/logout', [AuthAdminController::class, 'logout']);
+    Route::post('/change-password', [AuthAdminController::class, 'changePassword']);
+    Route::get('/profile', [ProfileAdminController::class, 'profile']);
+    Route::put('/profile', [ProfileAdminController::class, 'updateProfile']);
+    Route::delete('/delete-account', [ProfileAdminController::class, 'deleteAccount']);
 });
 //User
 
@@ -77,6 +77,7 @@ Route::middleware([
     'auth:sanctum',
 ])->group(function () {
     Route::apiResource('properties', PropertyController::class);
+    Route::get('my-properties', [PropertyController::class, 'myProperties']);
     Route::get('properties/stats', [PropertyController::class, 'getStats']);
     Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
 });

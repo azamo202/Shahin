@@ -5,7 +5,7 @@ namespace App\Http\Controllers\User\AuthUser;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request\User;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\User\DeleteAccountRequest;
+use App\Http\Requests\User\Auth\DeleteAccountRequest;
 use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller

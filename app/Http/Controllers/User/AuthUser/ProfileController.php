@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\User\AuthUser;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\User\UpdateProfileRequest;
+use App\Http\Requests\User\Auth\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

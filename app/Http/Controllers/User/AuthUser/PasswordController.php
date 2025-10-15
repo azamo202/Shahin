@@ -4,7 +4,7 @@ namespace App\Http\Controllers\User\AuthUser;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\User\ChangePasswordRequest;
+use App\Http\Requests\User\Auth\ChangePasswordRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 

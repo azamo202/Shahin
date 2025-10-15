@@ -152,6 +152,19 @@ class PropertyController extends Controller
         return $this->successResponse(null, 'تم حذف العقار بنجاح');
     }
 
+    /** جلب جميع العقارات الخاصة بالمستخدم (كل الحالات) */
+    public function myProperties(Request $request)
+    {
+        $user = $request->user();
+
+        $properties = Property::forUser($user->id)
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $this->successResponse($properties, 'تم جلب جميع العقارات الخاصة بك بنجاح');
+    }
+
+
     /** جلب العقارات حسب الحالة */
     public function getByStatus(Request $request, $status)
     {
