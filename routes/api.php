@@ -11,6 +11,7 @@ use App\Http\Controllers\User\AuthUser\AuthController;
 use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
+use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\CheckUserRole;
@@ -63,6 +64,18 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::put('/profile', [ProfileAdminController::class, 'updateProfile']);
     Route::delete('/delete-account', [ProfileAdminController::class, 'deleteAccount']);
 });
+
+
+//إدراة الأراضي
+Route::prefix('admin/properties')->group(function () {
+    Route::get('/', [AdminPropertyController::class, 'getAllProperties']);
+    Route::get('/{id}', [AdminPropertyController::class, 'getProperty']); // الجديد
+    Route::get('/accepted', [AdminPropertyController::class, 'getAcceptedProperties']);
+    Route::get('/rejected', [AdminPropertyController::class, 'getRejectedProperties']);
+    Route::get('/pending', [AdminPropertyController::class, 'getPendingProperties']);
+    Route::get('/stats', [AdminPropertyController::class, 'getPropertiesStats']);
+});
+
 //User
 
 //الأراضي
