@@ -74,9 +74,8 @@ class AdminPropertyController extends Controller
     public function getOpenProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user', 'images'])
-                ->withStatus('مفتوح')   // ✅ بدل مقبول
-                ->withFilters($this->prepareFilters($request))
+            $properties = Property::with(['user'])
+                ->where('status', 'مفتوح')
                 ->latest()
                 ->paginate(15);
 
@@ -99,9 +98,8 @@ class AdminPropertyController extends Controller
     public function getRejectedProperties(Request $request): JsonResponse
     {
         try {
-            $properties = Property::with(['user', 'images'])
-                ->withStatus('مرفوض')
-                ->withFilters($this->prepareFilters($request))
+            $properties = Property::with(['user'])
+                ->where('status', 'مرفوض')
                 ->latest()
                 ->paginate(15);
 
@@ -117,6 +115,7 @@ class AdminPropertyController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * جلب الأراضي قيد المعالجة
