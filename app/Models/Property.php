@@ -73,7 +73,7 @@ class Property extends Model
      */
     public function scopeAccepted($query)
     {
-        return $query->where('status', 'مقبول');
+        return $query->where('status', 'مفتوح');
     }
 
     /**

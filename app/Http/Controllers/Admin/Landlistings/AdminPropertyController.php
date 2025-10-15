@@ -41,7 +41,7 @@ class AdminPropertyController extends Controller
     {
         try {
             $property = Property::with([
-                'user:id,full_name,email,phone', 
+                'user:id,full_name,email,phone',
                 'images'
             ])->find($id);
 
@@ -68,11 +68,14 @@ class AdminPropertyController extends Controller
     /**
      * جلب الأراضي المقبولة
      */
-    public function getAcceptedProperties(Request $request): JsonResponse
+    /**
+     * جلب الأراضي المفتوحة (كانت مقبولة سابقًا)
+     */
+    public function getOpenProperties(Request $request): JsonResponse
     {
         try {
             $properties = Property::with(['user', 'images'])
-                ->accepted()
+                ->withStatus('مفتوح')   // ✅ بدل مقبول
                 ->withFilters($this->prepareFilters($request))
                 ->latest()
                 ->paginate(15);
@@ -80,12 +83,12 @@ class AdminPropertyController extends Controller
             return response()->json([
                 'success' => true,
                 'data' => $properties,
-                'message' => 'تم جلب الأراضي المقبولة بنجاح'
+                'message' => 'تم جلب الأراضي المفتوحة بنجاح'
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'حدث خطأ أثناء جلب الأراضي المقبولة: ' . $e->getMessage()
+                'message' => 'حدث خطأ أثناء جلب الأراضي المفتوحة: ' . $e->getMessage()
             ], 500);
         }
     }
