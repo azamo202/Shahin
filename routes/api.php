@@ -12,6 +12,7 @@ use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
+use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
@@ -66,18 +67,19 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
 
 //الأراضي
 // Routes عامة للعقارات (للمسجلين وغير المسجلين)
+// ✅ Public Routes (No Auth)
 Route::prefix('properties')->group(function () {
-    // جلب جميع العقارات المقبولة للواجهة العامة
-    Route::get('/public', [PropertyController::class, 'indexPublic']);
-    Route::get('/public/{id}', [PropertyController::class, 'showPublic']);
+    Route::get('/', [PublicPropertyController::class, 'index']);
+    Route::get('/{id}', [PublicPropertyController::class, 'show']);
 });
 
-// Routes للمستخدمين المسجلين (كما عندك)
-Route::middleware([
-    'auth:sanctum',
-])->group(function () {
-    Route::apiResource('properties', PropertyController::class);
-    Route::get('my-properties', [PropertyController::class, 'myProperties']);
-    Route::get('properties/stats', [PropertyController::class, 'getStats']);
-    Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
+// ✅ User Routes (Requires Auth)
+Route::middleware('auth:sanctum')->prefix('user/properties')->group(function () {
+    Route::post('/', [PropertyController::class, 'store']);
+    Route::put('/{id}', [PropertyController::class, 'update']);
+    Route::patch('/{id}', [PropertyController::class, 'update']);
+    Route::delete('/{id}', [PropertyController::class, 'destroy']);
+    Route::get('/my', [PropertyController::class, 'myProperties']);
+    Route::get('/status/{status}', [PropertyController::class, 'getByStatus']);
+    Route::get('/stats', [PropertyController::class, 'getStats']);
 });

@@ -11,55 +11,10 @@ use Illuminate\Support\Str;
 
 class PropertyController extends Controller
 {
-    /** جلب العقارات للواجهة العامة (الزوار) */
-    public function indexPublic()
-    {
-        $properties = Property::accepted() // فقط العقارات المقبولة
-            ->orderByDesc('created_at')
-            ->get();
-
-        return $this->successResponse($properties, 'تم جلب العقارات بنجاح');
-    }
-
-    /** عرض عقار محدد للواجهة العامة */
-    public function showPublic($id)
-    {
-        // جلب العقار مع الصور
-        $property = Property::accepted()->with('images')->find($id);
-
-        if (!$property) {
-            return $this->errorResponse('العقار غير موجود', 404);
-        }
-
-        return $this->successResponse($property, 'تم جلب بيانات العقار بنجاح');
-    }
-
-
     // رسائل جاهزة
     private const MSG_NOT_FOUND = 'العقار غير موجود أو لا تملك صلاحية الوصول إليه';
     private const MSG_UNAUTHORIZED = 'لا يمكن تنفيذ هذا الإجراء على العقار في حالته الحالية';
 
-    /** عرض جميع العقارات المقبولة */
-    public function index(Request $request)
-    {
-        $user = $request->user();
-
-        $properties = Property::forUser($user->id)
-            ->accepted()
-            ->orderByDesc('created_at')
-            ->get();
-
-        return $this->successResponse($properties, 'تم جلب العقارات المقبولة بنجاح');
-    }
-
-    /** عرض عقار محدد */
-    public function show(Request $request, $id)
-    {
-        $property = $this->findProperty($request, $id, true);
-        if (!$property) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
-
-        return $this->successResponse($property, 'تم جلب بيانات العقار بنجاح');
-    }
 
     /** إنشاء عقار جديد */
     public function store(PropertyRequest $request)
@@ -92,7 +47,6 @@ class PropertyController extends Controller
             return $this->successResponse($property, 'تم إنشاء العقار بنجاح وجاري مراجعته', 201);
         } catch (\Exception $e) {
             // حذف صورة الغلاف إذا حصل خطأ
-            // حذف صورة الغلاف إذا حصل خطأ
             if (isset($property) && $property->cover_image) {
                 Storage::disk('public')->delete($property->cover_image);
             }
@@ -105,11 +59,9 @@ class PropertyController extends Controller
                 }
             }
 
-
             return $this->errorResponse('حدث خطأ أثناء إنشاء العقار: ' . $e->getMessage());
         }
     }
-
 
     /** تحديث عقار موجود */
     public function update(PropertyRequest $request, $id)
@@ -163,7 +115,6 @@ class PropertyController extends Controller
 
         return $this->successResponse($properties, 'تم جلب جميع العقارات الخاصة بك بنجاح');
     }
-
 
     /** جلب العقارات حسب الحالة */
     public function getByStatus(Request $request, $status)
