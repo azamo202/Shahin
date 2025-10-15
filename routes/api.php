@@ -12,6 +12,7 @@ use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
+use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 
@@ -72,14 +73,14 @@ Route::prefix('properties')->group(function () {
 });
 
 // Routes للمستخدمين المسجلين (كما عندك)
-Route::middleware(['auth:sanctum', UserMiddleware::class])->group(function () {
+Route::middleware([
+    'auth:sanctum',
+    \App\Http\Middleware\UserMiddleware::class,
+    'check.user.role:مالك أرض,وسيط عقاري,جهة تجارية,وكيل قانوني'
+])->group(function () {
     Route::prefix('properties')->group(function () {
-        Route::get('/', [PropertyController::class, 'index']);
-        Route::post('/', [PropertyController::class, 'store']);
-        Route::get('/stats', [PropertyController::class, 'getStats']);
-        Route::get('/status/{status}', [PropertyController::class, 'getByStatus']);
-        Route::get('/{id}', [PropertyController::class, 'show']);
-        Route::put('/{id}', [PropertyController::class, 'update']);
-        Route::delete('/{id}', [PropertyController::class, 'destroy']);
+        Route::apiResource('properties', PropertyController::class);
+        Route::get('properties/stats', [PropertyController::class, 'getStats']);
+        Route::get('properties/status/{status}', [PropertyController::class, 'getByStatus']);
     });
 });

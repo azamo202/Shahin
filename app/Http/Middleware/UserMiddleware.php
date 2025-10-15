@@ -39,17 +39,7 @@ class UserMiddleware
             ], 403);
         }
 
-        // 4. التحقق من نوع المستخدم (الصلاحية)
-        $allowedRoles = [2, 3, 4, 5];
-
-        // التحقق من نوع المستخدم عبر العلاقة
-        if (!in_array($user->user_type_id, $allowedRoles)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'ليس لديك صلاحية للوصول'
-            ], 403);
-        }
-
+        // ✅ مهم جداً: السماح بالمتابعة بعد التحقق
         return $next($request);
     }
 }
