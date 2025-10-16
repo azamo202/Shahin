@@ -11,7 +11,7 @@ class PublicPropertyController extends Controller
     /** جلب العقارات للواجهة العامة (الزوار) مع الفلترة */
     public function index(Request $request)
     {
-        $query = Property::accepted()->with('images');
+        $query = Property::whereIn('status', ['مفتوح', 'تم البيع'])->with('images');
 
         // تطبيق الفلاتر
         $query = $this->applyFilters($query, $request);
@@ -32,7 +32,7 @@ class PublicPropertyController extends Controller
     /** عرض عقار محدد للواجهة العامة */
     public function show($id)
     {
-        $property = Property::accepted()->with('images')->find($id);
+        $property = Property::whereIn('status', ['مفتوح', 'تم البيع'])->with('images')->find($id);
 
         if (!$property) {
             return response()->json([
@@ -95,7 +95,6 @@ class PublicPropertyController extends Controller
             $query->where('estimated_investment_value', '<=', $request->max_investment);
         }
 
-    
         // البحث في العنوان والوصف
         if ($request->has('search') && $request->search) {
             $searchTerm = '%' . $request->search . '%';
@@ -154,21 +153,21 @@ class PublicPropertyController extends Controller
     public function getFilterOptions()
     {
         $options = [
-            'regions' => Property::accepted()->distinct()->pluck('region')->filter()->values(),
-            'cities' => Property::accepted()->distinct()->pluck('city')->filter()->values(),
+            'regions' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->distinct()->pluck('region')->filter()->values(),
+            'cities' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->distinct()->pluck('city')->filter()->values(),
             'land_types' => ['سكني', 'تجاري', 'زراعي'],
             'purposes' => ['بيع', 'استثمار'],
             'price_ranges' => [
-                'min' => Property::accepted()->min('price_per_sqm'),
-                'max' => Property::accepted()->max('price_per_sqm')
+                'min' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->min('price_per_sqm'),
+                'max' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->max('price_per_sqm')
             ],
             'area_ranges' => [
-                'min' => Property::accepted()->min('total_area'),
-                'max' => Property::accepted()->max('total_area')
+                'min' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->min('total_area'),
+                'max' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->max('total_area')
             ],
             'investment_ranges' => [
-                'min' => Property::accepted()->min('estimated_investment_value'),
-                'max' => Property::accepted()->max('estimated_investment_value')
+                'min' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->min('estimated_investment_value'),
+                'max' => Property::whereIn('status', ['مفتوح', 'تم البيع'])->max('estimated_investment_value')
             ]
         ];
 
