@@ -1,29 +1,33 @@
-# المرحلة 1: بناء الاعتماديات (Composer)
-FROM composer:2 AS vendor
-WORKDIR /app
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# استخدم صورة PHP CLI مع الإصدارات المطلوبة
+FROM php:8.2-cli
 
-# المرحلة 2: صورة PHP-FPM
-FROM php:8.2-fpm
-
-# تثبيت الإضافات المطلوبة
+# تثبيت الاعتماديات الأساسية
 RUN apt-get update && apt-get install -y \
     libzip-dev \
-    zip unzip git curl \
+    zip \
+    unzip \
+    git \
+    curl \
     && docker-php-ext-install pdo_mysql zip
 
-# نسخ الملفات
-WORKDIR /app
-COPY . .
-COPY --from=vendor /app/vendor ./vendor
+# تثبيت Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# إعداد Laravel
+# تعيين مجلد العمل
+WORKDIR /app
+
+# نسخ ملفات المشروع إلى الحاوية
+COPY . .
+
+# تثبيت اعتماديات المشروع
+RUN composer install --no-dev --optimize-autoloader
+
+# نسخ ملف البيئة وضبط أذونات التخزين
 RUN cp .env.example .env && php artisan key:generate
 RUN chmod -R 777 storage bootstrap/cache
 
-# المنفذ المستخدم من PHP-FPM
-EXPOSE 9000
+# فتح المنفذ الذي سيعمل عليه API
+EXPOSE 8000
 
-# تشغيل PHP-FPM
-CMD ["php-fpm"]
+# تشغيل الخادم الخاص بـ Laravel (يمكن تغييره لاحقًا إلى سيرفر إنتاج مثل Nginx أو PHP-FPM)
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=${PORT}"]
