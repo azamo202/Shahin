@@ -8,17 +8,30 @@ use App\Http\Requests\User\Auctions\UpdateAuctionRequest;
 use App\Models\Auction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class AuctionController extends Controller
 {
     // الرسائل الجاهزة
     private const MSG_NOT_FOUND = 'المزاد غير موجود أو لا تملك صلاحية الوصول إليه';
     private const MSG_UNAUTHORIZED = 'لا يمكن تنفيذ هذا الإجراء على المزاد في حالته الحالية';
+    private const MSG_FORBIDDEN = 'غير مسموح لك بتنفيذ هذا الإجراء';
+
+    /** تحقق من نوع المستخدم */
+    private function authorizeCompany(Request $request)
+    {
+        if ($request->user()->user_type !== 6) {
+            abort(response()->json([
+                'status' => false,
+                'message' => self::MSG_FORBIDDEN
+            ], 403));
+        }
+    }
 
     /** عرض كل مزادات المستخدم */
     public function index(Request $request)
     {
+        $this->authorizeCompany($request);
+
         $user = $request->user();
         $auctions = $user->auctions()->latest()->get();
 
@@ -28,6 +41,8 @@ class AuctionController extends Controller
     /** عرض مزاد محدد */
     public function show(Request $request, $id)
     {
+        $this->authorizeCompany($request);
+
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
@@ -37,6 +52,8 @@ class AuctionController extends Controller
     /** إنشاء مزاد جديد */
     public function store(StoreAuctionRequest $request)
     {
+        $this->authorizeCompany($request);
+
         $user = $request->user();
 
         DB::beginTransaction();
@@ -59,6 +76,8 @@ class AuctionController extends Controller
     /** تحديث المزاد */
     public function update(UpdateAuctionRequest $request, $id)
     {
+        $this->authorizeCompany($request);
+
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
@@ -83,6 +102,8 @@ class AuctionController extends Controller
     /** حذف المزاد */
     public function destroy(Request $request, $id)
     {
+        $this->authorizeCompany($request);
+
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
@@ -101,6 +122,8 @@ class AuctionController extends Controller
     /** جلب المزادات حسب الحالة */
     public function getByStatus(Request $request, $status)
     {
+        $this->authorizeCompany($request);
+
         $allowedStatuses = ['قيد المراجعة', 'مقبول', 'مرفوض'];
         if (!in_array($status, $allowedStatuses)) {
             return $this->errorResponse('حالة غير صحيحة', 400);
@@ -115,6 +138,8 @@ class AuctionController extends Controller
     /** إحصائيات المزادات */
     public function getStats(Request $request)
     {
+        $this->authorizeCompany($request);
+
         $user = $request->user();
         $stats = [
             'total' => $user->auctions()->count(),

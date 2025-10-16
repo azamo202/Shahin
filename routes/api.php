@@ -13,6 +13,7 @@ use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
+use App\Http\Controllers\User\Auctions\AuctionController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\CheckUserRole;
@@ -108,4 +109,16 @@ Route::middleware('auth:sanctum')->prefix('user/properties')->group(function () 
     Route::get('/my', [PropertyController::class, 'myProperties']);
     Route::get('/status/{status}', [PropertyController::class, 'getByStatus']);
     Route::get('/stats', [PropertyController::class, 'getStats']);
+});
+
+//المزادات الخاصة بشركات المزاد فقط
+Route::middleware('auth:sanctum')->prefix('user/auctions')->group(function () {
+    Route::get('/', [AuctionController::class, 'index']);
+    Route::get('/{id}', [AuctionController::class, 'show']);
+    Route::post('/', [AuctionController::class, 'store']);
+    Route::put('/{id}', [AuctionController::class, 'update']);
+    Route::delete('/{id}', [AuctionController::class, 'destroy']);
+    Route::get('/status/{status}', [AuctionController::class, 'getByStatus']);
+    Route::get('/stats', [AuctionController::class, 'getStats']);
+
 });
