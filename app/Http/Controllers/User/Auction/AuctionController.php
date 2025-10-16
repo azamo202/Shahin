@@ -119,7 +119,7 @@ class AuctionController extends Controller
         $stats = [
             'total' => $user->auctions()->count(),
             'under_review' => $user->auctions()->where('status', 'قيد المراجعة')->count(),
-            'approved' => $user->auctions()->where('status', 'مقبول')->count(),
+            'approved' => $user->auctions()->where('status', 'مفتوح')->count(),
             'rejected' => $user->auctions()->where('status', 'مرفوض')->count(),
         ];
 
