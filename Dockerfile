@@ -1,4 +1,3 @@
-# استخدم صورة PHP CLI مع الإصدارات المطلوبة
 FROM php:8.2-cli
 
 # تثبيت الاعتماديات الأساسية
@@ -22,12 +21,13 @@ COPY . .
 # تثبيت اعتماديات المشروع
 RUN composer install --no-dev --optimize-autoloader
 
-# نسخ ملف البيئة وضبط أذونات التخزين
-RUN cp .env.example .env && php artisan key:generate
-RUN chmod -R 777 storage bootstrap/cache
+# إنشاء مفتاح التطبيق وضبط الأذونات
+RUN php artisan key:generate
+RUN chmod -R 775 storage bootstrap/cache
 
-# فتح المنفذ الذي سيعمل عليه API
-EXPOSE 8000
+# تنظيف الذاكرة المؤقتة
+RUN php artisan config:cache
+RUN php artisan route:cache
 
-# تشغيل الخادم الخاص بـ Laravel (يمكن تغييره لاحقًا إلى سيرفر إنتاج مثل Nginx أو PHP-FPM)
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=$(($PORT))"]
+# تشغيل السيرفر باستخدام PORT من Render
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT}"]
