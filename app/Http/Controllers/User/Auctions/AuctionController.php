@@ -31,10 +31,8 @@ class AuctionController extends Controller
     public function index(Request $request)
     {
         $this->authorizeCompany($request);
-
         $user = $request->user();
         $auctions = $user->auctions()->latest()->get();
-
         return $this->successResponse($auctions, 'تم جلب المزادات الخاصة بك بنجاح');
     }
 
@@ -42,10 +40,8 @@ class AuctionController extends Controller
     public function show(Request $request, $id)
     {
         $this->authorizeCompany($request);
-
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
-
         return $this->successResponse($auction, 'تم جلب بيانات المزاد بنجاح');
     }
 
@@ -53,19 +49,24 @@ class AuctionController extends Controller
     public function store(StoreAuctionRequest $request)
     {
         $this->authorizeCompany($request);
-
         $user = $request->user();
 
         DB::beginTransaction();
         try {
-            $auction = $user->auctions()->create(array_merge(
-                $request->validated(),
-                [
-                    'status' => 'قيد المراجعة',
-                ]
-            ));
-            DB::commit();
+            $data = $request->validated();
 
+            // التعامل مع صورة الغلاف إن وجدت
+            if ($request->hasFile('cover_image')) {
+                $path = $request->file('cover_image')->store('auctions', 'public');
+                $data['cover_image'] = $path;
+            }
+
+            $auction = $user->auctions()->create(array_merge(
+                $data,
+                ['status' => 'قيد المراجعة']
+            ));
+
+            DB::commit();
             return $this->successResponse($auction, 'تم إنشاء المزاد بنجاح وجاري مراجعته', 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -77,21 +78,25 @@ class AuctionController extends Controller
     public function update(UpdateAuctionRequest $request, $id)
     {
         $this->authorizeCompany($request);
-
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-        if (in_array($auction->status, ['مقبول', 'مرفوض'])) {
+        if (in_array($auction->status, ['مفتوح', 'مرفوض'])) {
             return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
         }
 
         DB::beginTransaction();
         try {
-            $auction->update(array_merge($request->validated(), [
-                'status' => 'قيد المراجعة',
-            ]));
-            DB::commit();
+            $data = $request->validated();
 
+            // التعامل مع تحديث صورة الغلاف إن وجدت
+            if ($request->hasFile('cover_image')) {
+                $path = $request->file('cover_image')->store('auctions', 'public');
+                $data['cover_image'] = $path;
+            }
+
+            $auction->update(array_merge($data, ['status' => 'قيد المراجعة']));
+            DB::commit();
             return $this->successResponse($auction, 'تم تحديث المزاد بنجاح وجاري مراجعته');
         } catch (\Exception $e) {
             DB::rollBack();
@@ -103,11 +108,10 @@ class AuctionController extends Controller
     public function destroy(Request $request, $id)
     {
         $this->authorizeCompany($request);
-
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-        if ($auction->status === 'مقبول') {
+        if ($auction->status === 'مفتوح') {
             return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
         }
 
@@ -123,15 +127,13 @@ class AuctionController extends Controller
     public function getByStatus(Request $request, $status)
     {
         $this->authorizeCompany($request);
-
-        $allowedStatuses = ['قيد المراجعة', 'مقبول', 'مرفوض'];
+        $allowedStatuses = ['قيد المراجعة', 'مفتوح', 'مرفوض'];
         if (!in_array($status, $allowedStatuses)) {
             return $this->errorResponse('حالة غير صحيحة', 400);
         }
 
         $user = $request->user();
         $auctions = $user->auctions()->where('status', $status)->latest()->get();
-
         return $this->successResponse($auctions, "تم جلب المزادات ذات الحالة: {$status}");
     }
 
@@ -139,7 +141,6 @@ class AuctionController extends Controller
     public function getStats(Request $request)
     {
         $this->authorizeCompany($request);
-
         $user = $request->user();
         $stats = [
             'total' => $user->auctions()->count(),
@@ -147,7 +148,6 @@ class AuctionController extends Controller
             'approved' => $user->auctions()->where('status', 'مفتوح')->count(),
             'rejected' => $user->auctions()->where('status', 'مرفوض')->count(),
         ];
-
         return $this->successResponse($stats, 'تم جلب إحصائيات المزادات بنجاح');
     }
 

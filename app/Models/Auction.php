@@ -21,6 +21,7 @@ class Auction extends Model
         'latitude',
         'longitude',
         'status',
+        'cover_image', // حقل الغلاف الجديد
     ];
 
     /**

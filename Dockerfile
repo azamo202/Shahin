@@ -30,5 +30,5 @@ RUN chmod -R 777 storage bootstrap/cache
 EXPOSE 8000
 
 # تشغيل الخادم الخاص بـ Laravel (يمكن تغييره لاحقًا إلى سيرفر إنتاج مثل Nginx أو PHP-FPM)
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$PORT"]
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
 

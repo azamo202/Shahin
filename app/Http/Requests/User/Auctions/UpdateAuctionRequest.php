@@ -22,6 +22,17 @@ class UpdateAuctionRequest extends FormRequest
             'address' => 'sometimes|required|string|max:255',
             'latitude' => 'nullable|numeric|between:-90,90',
             'longitude' => 'nullable|numeric|between:-180,180',
+
+            // تحديث غلاف المزاد
+            'cover_image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+
+            // تحديث الصور
+            'images' => 'sometimes|array|min:1',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+
+            // تحديث الفيديوهات
+            'videos' => 'sometimes|array',
+            'videos.*' => 'mimetypes:video/mp4,video/mpeg,video/quicktime|max:10240',
         ];
     }
 
@@ -52,6 +63,20 @@ class UpdateAuctionRequest extends FormRequest
 
             'longitude.numeric' => 'خط الطول يجب أن يكون رقمياً.',
             'longitude.between' => 'خط الطول يجب أن يكون بين -180 و 180.',
+
+            'cover_image.image' => 'الغلاف يجب أن يكون صورة.',
+            'cover_image.mimes' => 'الغلاف يجب أن يكون من نوع jpeg, png, jpg, gif, webp.',
+            'cover_image.max' => 'حجم الغلاف لا يمكن أن يزيد عن 2MB.',
+
+            'images.array' => 'صور المزاد يجب أن تكون مصفوفة.',
+            'images.min' => 'يجب رفع صورة واحدة على الأقل.',
+            'images.*.image' => 'كل عنصر من الصور يجب أن يكون صورة.',
+            'images.*.mimes' => 'نوع الصور يجب أن يكون jpeg, png, jpg, gif, webp.',
+            'images.*.max' => 'حجم كل صورة لا يمكن أن يزيد عن 2MB.',
+
+            'videos.array' => 'فيديوهات المزاد يجب أن تكون مصفوفة.',
+            'videos.*.mimetypes' => 'نوع الفيديو يجب أن يكون mp4, mpeg, quicktime.',
+            'videos.*.max' => 'حجم كل فيديو لا يمكن أن يزيد عن 10MB.',
         ];
     }
 }
