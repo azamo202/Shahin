@@ -93,7 +93,7 @@ class RegisterRequest extends FormRequest
                         'max:100',
                         Rule::unique('business_entities', 'commercial_register'),
                     ],
-                    'commercial_register_file' => 'required_if:user_type_id,4|file|mimes:jpg,jpeg,png,pdf|max:5120',
+                    'commercial_file' => 'required_if:user_type_id,4|file|mimes:jpg,jpeg,png,pdf|max:5120',
                 ]);
                 break;
 
@@ -163,10 +163,10 @@ class RegisterRequest extends FormRequest
 
             'commercial_register.required_if' => 'رقم السجل التجاري مطلوب',
             'commercial_register.unique' => 'رقم السجل التجاري مستخدم من قبل',
-            'commercial_register_file.required_if' => 'ملف السجل التجاري مطلوب',
-            'commercial_register_file.file' => 'ملف السجل التجاري غير صالح',
-            'commercial_register_file.mimes' => 'الصيغ المسموح بها: jpg, jpeg, png, pdf',
-            'commercial_register_file.max' => 'حجم الملف أكبر من المسموح (5MB)',
+            'commercial_file.required_if' => 'ملف السجل التجاري مطلوب',
+            'commercial_file.file' => 'ملف السجل التجاري غير صالح',
+            'commercial_file.mimes' => 'الصيغ المسموح بها: jpg, jpeg, png, pdf',
+            'commercial_file.max' => 'حجم الملف أكبر من المسموح (5MB)',
 
             'license_number.required_if' => 'رقم الترخيص مطلوب',
             'license_number.unique' => 'رقم الترخيص مستخدم من قبل',
