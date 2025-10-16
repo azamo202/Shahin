@@ -113,7 +113,7 @@ class RegisterRequest extends FormRequest
                 $rules = array_merge($rules, [
                     'auction_name' => 'required_if:user_type_id,6|string|max:150',
                     // commercial_register_file موجود في مخططك كـ commercial_register_file
-                    'commercial_register_file' => 'required_if:user_type_id,6|file|mimes:jpg,jpeg,png,pdf|max:5120',
+                    'commercial_file' => 'required_if:user_type_id,6|file|mimes:jpg,jpeg,png,pdf|max:5120',
                     'license_number' => [
                         'required_if:user_type_id,6',
                         'string',
