@@ -21,4 +21,5 @@ class AuctionVideo extends Model
     {
         return $this->belongsTo(Auction::class);
     }
+    
 }
