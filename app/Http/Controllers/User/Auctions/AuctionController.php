@@ -19,7 +19,7 @@ class AuctionController extends Controller
     /** تحقق من نوع المستخدم */
     private function authorizeCompany(Request $request)
     {
-        if ($request->user()->user_type !== 6) {
+        if ($request->user()->user_type_id !== 6) {
             abort(response()->json([
                 'status' => false,
                 'message' => self::MSG_FORBIDDEN
@@ -81,7 +81,7 @@ class AuctionController extends Controller
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-        if (in_array($auction->status, ['مفتوح', 'مرفوض'])) {
+        if (in_array($auction->status, ['تم البيع', 'قيدالمراجعة','مفتوح'])) {
             return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
         }
 
