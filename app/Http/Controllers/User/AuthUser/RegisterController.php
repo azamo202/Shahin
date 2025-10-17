@@ -84,7 +84,7 @@ class RegisterController extends Controller
                     'business_name' => $request->business_name,
                     'commercial_register' => $request->commercial_register,
                     'national_id' => $request->national_id,
-                    'commercial_file' => $request->file('commercial_register_file')->store('files', 'public'),
+                    'commercial_file' => $request->file('commercial_file')->store('files', 'public'),
                 ]);
                 break;
             case 5: // وسيط عقاري
@@ -99,7 +99,7 @@ class RegisterController extends Controller
                     'auction_name' => $request->auction_name,
                     'national_id' => $request->national_id,
                     'commercial_register' => $request->commercial_register,
-                    'commercial_file' => $request->file('commercial_register_file')->store('files', 'public'),
+                    'commercial_file' => $request->file('commercial_file')->store('files', 'public'),
                     'license_number' => $request->license_number,
                     'license_file' => $request->file('license_file')->store('files', 'public'),
                 ]);
