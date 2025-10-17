@@ -66,6 +66,27 @@ class AuctionController extends Controller
                 ['status' => 'قيد المراجعة']
             ));
 
+
+            // حفظ الصور
+            if ($request->has('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('auctions/images', 'public');
+                    $auction->images()->create([
+                        'image_path' => $path
+                    ]);
+                }
+            }
+
+            // حفظ الفيديوهات
+            if ($request->has('videos')) {
+                foreach ($request->file('videos') as $video) {
+                    $path = $video->store('auctions/videos', 'public');
+                    $auction->videos()->create([
+                        'video_path' => $path
+                    ]);
+                }
+            }
+
             DB::commit();
             return $this->successResponse($auction, 'تم إنشاء المزاد بنجاح وجاري مراجعته', 201);
         } catch (\Exception $e) {
@@ -81,7 +102,7 @@ class AuctionController extends Controller
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-        if (in_array($auction->status, ['تم البيع', 'قيدالمراجعة','مفتوح'])) {
+        if (in_array($auction->status, ['تم البيع', 'قيدالمراجعة', 'مفتوح'])) {
             return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
         }
 
