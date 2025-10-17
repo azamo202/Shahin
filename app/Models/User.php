@@ -43,9 +43,9 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(UserType::class, 'user_type_id');
     }
     // علاقة المستخدم بالأراضي
-    public function landListings()
+    public function property()
     {
-        return $this->hasMany(LandListing::class);
+        return $this->hasMany(property::class);
     }
 
     // ✅ دوال التحقق من الحالة
@@ -87,5 +87,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isInactive(): bool
     {
         return $this->isPending(); // أي حساب قيد المراجعة يعتبر غير نشط
+    }
+    public function auctions()
+    {
+        return $this->hasMany(Auction::class, 'user_id');
     }
 }
