@@ -47,4 +47,12 @@ class Auction extends Model
     {
         return $this->hasMany(AuctionVideo::class);
     }
+    public function auction_companies()
+    {
+        return $this->belongsTo(AuctionCompany::class, 'company_id', 'id');
+    }
+    public function company()
+    {
+        return $this->belongsTo(AuctionCompany::class, 'user_id', 'user_id');
+    }
 }
