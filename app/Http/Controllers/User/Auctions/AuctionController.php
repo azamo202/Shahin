@@ -103,7 +103,7 @@ class AuctionController extends Controller
         $auction = $this->findAuction($request, $id);
         if (!$auction) return $this->errorResponse(self::MSG_NOT_FOUND, 404);
 
-        if (in_array($auction->status, ['تم البيع', 'قيدالمراجعة', 'مفتوح'])) {
+        if (in_array($auction->status, ['تم البيع', 'قيدالمراجعة',])) {
             return $this->errorResponse(self::MSG_UNAUTHORIZED, 403);
         }
 
