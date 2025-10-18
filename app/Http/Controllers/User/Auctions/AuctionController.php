@@ -78,7 +78,7 @@ class AuctionController extends Controller
             }
 
             // حفظ الفيديوهات
-            if ($request->has('videos')) {
+            if ($request->hasFile('videos')) {
                 foreach ($request->file('videos') as $video) {
                     $path = $video->store('auctions/videos', 'public');
                     $auction->videos()->create([
@@ -86,6 +86,7 @@ class AuctionController extends Controller
                     ]);
                 }
             }
+
 
             DB::commit();
             return $this->successResponse($auction, 'تم إنشاء المزاد بنجاح وجاري مراجعته', 201);
