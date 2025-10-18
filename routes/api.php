@@ -108,7 +108,7 @@ Route::prefix('clients')->group(function () {
 // ✅ Public Routes (No Auth)
 Route::prefix('properties')->group(function () {
     Route::get('/auctions/latest', [PublicAuctionController::class, 'latest']);
-    Route::get('/properties/latest', [PublicPropertyController::class, 'latest']);
+    Route::get('/properties/latest', [PublicPropertyController::class, 'latestProperties']);
     Route::get('/', [PublicPropertyController::class, 'index']);
     Route::get('/{id}', [PublicPropertyController::class, 'show']);
     Route::get('/filter-options', [PublicPropertyController::class, 'getFilterOptions']);
