@@ -91,7 +91,7 @@ Route::prefix('admin/properties')->middleware(['auth:sanctum', IsAdmin::class])-
 
 
 Route::prefix('admin/clients')
-    ->middleware(['auth:sanctum', 'isAdmin'])
+    ->middleware(['auth:sanctum'])
     ->group(function () {
         Route::get('/', [FeaturedClientController::class, 'index']);
         Route::post('/', [FeaturedClientController::class, 'store']);
