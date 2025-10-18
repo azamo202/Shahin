@@ -14,9 +14,9 @@ use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Auctions\AuctionController;
+use App\Http\Controllers\User\Auctions\PublicAuctionController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
-use App\Http\Middleware\CheckUserRole;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 
@@ -111,6 +111,11 @@ Route::middleware('auth:sanctum')->prefix('user/properties')->group(function () 
     Route::get('/stats', [PropertyController::class, 'getStats']);
 });
 
+
+// روابط المزادات العامة
+Route::get('/auctions', [PublicAuctionController::class, 'index'])->name('auctions.index');
+Route::get('/auctions/search', [PublicAuctionController::class, 'search'])->name('auctions.search');
+Route::get('/auctions/{id}', [PublicAuctionController::class, 'show'])->name('auctions.show');
 //المزادات الخاصة بشركات المزاد فقط
 Route::middleware('auth:sanctum')->prefix('user/auctions')->group(function () {
     Route::get('/', [AuctionController::class, 'index']);

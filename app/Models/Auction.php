@@ -9,7 +9,6 @@ class Auction extends Model
 {
     use HasFactory;
 
-    // الحقول القابلة للتعيين جماعياً
     protected $fillable = [
         'user_id',
         'title',
@@ -21,29 +20,29 @@ class Auction extends Model
         'latitude',
         'longitude',
         'status',
-        'cover_image', // حقل الغلاف الجديد
+        'cover_image',
     ];
 
-    /**
-     * ربط المزاد بالمستخدم الذي أنشأه
-     */
+    protected $casts = [
+        'auction_date' => 'date',
+    ];
+
+    // النطاق للمزادات المفتوحة فقط
+    public function scopeOpen($query)
+    {
+        return $query->where('status', 'open');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-
-    /**
-     * ربط المزاد بالصور
-     */
     public function images()
     {
         return $this->hasMany(AuctionImage::class);
     }
 
-    /**
-     * ربط المزاد بالفيديوهات
-     */
     public function videos()
     {
         return $this->hasMany(AuctionVideo::class);
