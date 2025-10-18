@@ -8,6 +8,18 @@ use Illuminate\Http\Request;
 
 class PublicPropertyController extends Controller
 {
+
+    public function latestProperties()
+    {
+        $properties = Property::latestPublic()->get();
+
+        return response()->json([
+            'status' => true,
+            'data' => $properties,
+            'message' => 'تم جلب آخر 7 أراضي بنجاح'
+        ]);
+    }
+
     /** جلب العقارات للواجهة العامة (الزوار) مع الفلترة */
     public function index(Request $request)
     {
@@ -98,11 +110,11 @@ class PublicPropertyController extends Controller
         // البحث في العنوان والوصف
         if ($request->has('search') && $request->search) {
             $searchTerm = '%' . $request->search . '%';
-            $query->where(function($q) use ($searchTerm) {
+            $query->where(function ($q) use ($searchTerm) {
                 $q->where('title', 'like', $searchTerm)
-                  ->orWhere('description', 'like', $searchTerm)
-                  ->orWhere('region', 'like', $searchTerm)
-                  ->orWhere('city', 'like', $searchTerm);
+                    ->orWhere('description', 'like', $searchTerm)
+                    ->orWhere('region', 'like', $searchTerm)
+                    ->orWhere('city', 'like', $searchTerm);
             });
         }
 
@@ -116,8 +128,11 @@ class PublicPropertyController extends Controller
         $sortOrder = $request->get('sort_order', 'desc');
 
         $allowedSortFields = [
-            'created_at', 'total_area', 'price_per_sqm', 
-            'estimated_investment_value', 'investment_duration'
+            'created_at',
+            'total_area',
+            'price_per_sqm',
+            'estimated_investment_value',
+            'investment_duration'
         ];
 
         if (in_array($sortBy, $allowedSortFields)) {
@@ -134,10 +149,22 @@ class PublicPropertyController extends Controller
     {
         $filters = [];
         $filterFields = [
-            'region', 'city', 'land_type', 'purpose', 
-            'min_area', 'max_area', 'min_price', 'max_price',
-            'min_investment', 'max_investment', 'max_duration',
-            'date_from', 'date_to', 'search', 'sort_by', 'sort_order'
+            'region',
+            'city',
+            'land_type',
+            'purpose',
+            'min_area',
+            'max_area',
+            'min_price',
+            'max_price',
+            'min_investment',
+            'max_investment',
+            'max_duration',
+            'date_from',
+            'date_to',
+            'search',
+            'sort_by',
+            'sort_order'
         ];
 
         foreach ($filterFields as $field) {

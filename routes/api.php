@@ -107,6 +107,8 @@ Route::prefix('clients')->group(function () {
 // Routes عامة للعقارات (للمسجلين وغير المسجلين)
 // ✅ Public Routes (No Auth)
 Route::prefix('properties')->group(function () {
+    Route::get('/auctions/latest', [PublicAuctionController::class, 'latest']);
+    Route::get('/properties/latest', [PropertyController::class, 'latest']);
     Route::get('/', [PublicPropertyController::class, 'index']);
     Route::get('/{id}', [PublicPropertyController::class, 'show']);
     Route::get('/filter-options', [PublicPropertyController::class, 'getFilterOptions']);

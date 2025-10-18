@@ -172,14 +172,14 @@ class Property extends Model
      */
     public function scopeSearch($query, $searchTerm)
     {
-        return $query->where(function($q) use ($searchTerm) {
+        return $query->where(function ($q) use ($searchTerm) {
             $q->where('title', 'like', '%' . $searchTerm . '%')
-              ->orWhere('description', 'like', '%' . $searchTerm . '%')
-              ->orWhere('region', 'like', '%' . $searchTerm . '%')
-              ->orWhere('city', 'like', '%' . $searchTerm . '%');
+                ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                ->orWhere('region', 'like', '%' . $searchTerm . '%')
+                ->orWhere('city', 'like', '%' . $searchTerm . '%');
         });
     }
-       /**
+    /**
      * Scope شامل لجميع الفلاتر
      */
     public function scopeWithFilters($query, array $filters = [])
@@ -264,5 +264,12 @@ class Property extends Model
             return $this->price_per_sqm * $this->total_area;
         }
         return null;
+    }
+    public function scopeLatestPublic($query, $limit = 7)
+    {
+        return $query->whereIn('status', ['مفتوح', 'تم البيع'])
+            ->with('images')
+            ->latest()
+            ->take($limit);
     }
 }

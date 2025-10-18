@@ -10,6 +10,35 @@ use Illuminate\Http\JsonResponse;
 class PublicAuctionController extends Controller
 {
     /**
+     * جلب آخر المزادات (لواجهة الموقع الرئيسية)
+     */
+    public function latest(Request $request): JsonResponse
+    {
+        try {
+            // عدد النتائج (افتراضي 7 ويمكن تغييره من الفرونت)
+            $limit = $request->get('limit', 7);
+
+            $auctions = Auction::whereIn('status', ['مفتوح', 'تم البيع'])
+                ->with(['company:id,user_id,auction_name', 'images', 'videos'])
+                ->latest() // أو ->orderBy('auction_date','desc')
+                ->take($limit)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $auctions,
+                'message' => 'تم جلب آخر المزادات بنجاح'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء جلب آخر المزادات',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * عرض قائمة المزادات العامة
      */
     public function index(Request $request): JsonResponse
@@ -51,7 +80,6 @@ class PublicAuctionController extends Controller
                 'data' => $auctions,
                 'message' => 'تم جلب المزادات بنجاح'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -76,7 +104,6 @@ class PublicAuctionController extends Controller
                 'data' => $auction,
                 'message' => 'تم جلب تفاصيل المزاد بنجاح'
             ]);
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -133,7 +160,6 @@ class PublicAuctionController extends Controller
                 'data' => $auctions,
                 'message' => 'تم البحث في المزادات بنجاح'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
