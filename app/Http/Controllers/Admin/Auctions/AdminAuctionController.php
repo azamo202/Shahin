@@ -15,7 +15,7 @@ class AdminAuctionController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = Auction::with(['company:id,user_id,auction_name', 'company.user:id,full_name ,email,phone', 'images', 'videos']);
+            $query = Auction::with(['company:id,user_id,auction_name', 'company.user:id,full_name,email,phone', 'images', 'videos']);
 
             // البحث بالكلمة المفتاحية
             if ($request->filled('search')) {
