@@ -119,11 +119,10 @@ Route::get('/auctions/{id}', [PublicAuctionController::class, 'show'])->name('au
 //المزادات الخاصة بشركات المزاد فقط
 Route::middleware('auth:sanctum')->prefix('user/auctions')->group(function () {
     Route::get('/', [AuctionController::class, 'index']);
+    Route::get('/stats', [AuctionController::class, 'getStats']);
     Route::get('/{id}', [AuctionController::class, 'show']);
     Route::post('/', [AuctionController::class, 'store']);
     Route::put('/{id}', [AuctionController::class, 'update']);
     Route::delete('/{id}', [AuctionController::class, 'destroy']);
     Route::get('/status/{status}', [AuctionController::class, 'getByStatus']);
-    Route::get('/stats', [AuctionController::class, 'getStats']);
-
 });
