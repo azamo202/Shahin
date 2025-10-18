@@ -93,7 +93,6 @@ Route::prefix('admin/properties')->middleware(['auth:sanctum', IsAdmin::class])-
 Route::prefix('admin/clients')
     ->middleware(['auth:sanctum'])
     ->group(function () {
-        Route::get('/', [FeaturedClientController::class, 'index']);
         Route::post('/', [FeaturedClientController::class, 'store']);
         Route::put('/{id}', [FeaturedClientController::class, 'update']);
         Route::delete('/{id}', [FeaturedClientController::class, 'destroy']);
@@ -106,9 +105,12 @@ Route::prefix('admin/clients')
 // Routes عامة للعقارات (للمسجلين وغير المسجلين)
 // ✅ Public Routes (No Auth)
 Route::prefix('properties')->group(function () {
+    Route::get('/Featured', [FeaturedClientController::class, 'index']);
     Route::get('/', [PublicPropertyController::class, 'index']);
     Route::get('/{id}', [PublicPropertyController::class, 'show']);
     Route::get('/filter-options', [PublicPropertyController::class, 'getFilterOptions']);
+    
+
 });
 
 // ✅ User Routes (Requires Auth)

@@ -41,31 +41,6 @@ class FeaturedClientController extends Controller
         return response()->json($client, 201);
     }
 
-    // تحديث عميل
-    public function update(Request $request, $id)
-    {
-        $client = FeaturedClient::findOrFail($id);
-
-        $request->validate([
-            'name' => 'sometimes|required|string',
-            'logo' => 'sometimes|image',
-            'website' => 'nullable|url',
-        ]);
-
-        if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('clients', 'public');
-            $client->logo = $path;
-        }
-
-        if ($request->filled('name')) $client->name = $request->name;
-        if ($request->filled('website')) $client->website = $request->website;
-
-        $client->save();
-
-        $client->logo = asset('storage/' . $client->logo);
-        return response()->json($client);
-    }
-
     // حذف عميل
     public function destroy($id)
     {
