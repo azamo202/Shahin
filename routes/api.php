@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\FeaturedClientController\FeaturedClientController
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Auctions\AuctionController;
+use App\Http\Controllers\Admin\Auctions\AdminAuctionController;
 use App\Http\Controllers\User\Auctions\PublicAuctionController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
@@ -100,6 +101,21 @@ Route::prefix('admin/clients')
 Route::prefix('clients')->group(function () {
     Route::get('/Featured', [FeaturedClientController::class, 'index']);
 });
+
+//إدارة المزادات
+Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
+
+    Route::get('auctions', [AdminAuctionController::class, 'index']);
+    Route::get('auctions/{id}', [AdminAuctionController::class, 'show']);
+    Route::get('auctions/pending/list', [AdminAuctionController::class, 'pending']);
+    Route::post('auctions/{id}/approve', [AdminAuctionController::class, 'approve']);
+    Route::post('auctions/{id}/reject', [AdminAuctionController::class, 'reject']);
+    Route::delete('auctions/{id}', [AdminAuctionController::class, 'destroy']);
+    Route::post('auctions/{id}/change-status', [AdminAuctionController::class, 'changeStatus']);
+    Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
+
+});
+
 
 //User
 

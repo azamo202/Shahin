@@ -21,6 +21,7 @@ class Auction extends Model
         'longitude',
         'status',
         'cover_image',
+        'rejection_reason',
     ];
 
     protected $casts = [
@@ -30,7 +31,7 @@ class Auction extends Model
     // النطاق للمزادات المفتوحة فقط
     public function scopeOpen($query)
     {
-        return $query->where('status', 'open');
+        return $query->where('status', 'مفتوح');
     }
 
     public function user()
