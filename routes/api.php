@@ -97,7 +97,9 @@ Route::prefix('admin/clients')
         Route::put('/{id}', [FeaturedClientController::class, 'update']);
         Route::delete('/{id}', [FeaturedClientController::class, 'destroy']);
     });
-
+Route::prefix('clients')->group(function () {
+    Route::get('/Featured', [FeaturedClientController::class, 'index']);
+});
 
 //User
 
@@ -105,12 +107,9 @@ Route::prefix('admin/clients')
 // Routes عامة للعقارات (للمسجلين وغير المسجلين)
 // ✅ Public Routes (No Auth)
 Route::prefix('properties')->group(function () {
-    Route::get('/Featured', [FeaturedClientController::class, 'index']);
     Route::get('/', [PublicPropertyController::class, 'index']);
     Route::get('/{id}', [PublicPropertyController::class, 'show']);
     Route::get('/filter-options', [PublicPropertyController::class, 'getFilterOptions']);
-    
-
 });
 
 // ✅ User Routes (Requires Auth)
