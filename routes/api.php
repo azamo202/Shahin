@@ -11,6 +11,7 @@ use App\Http\Controllers\User\AuthUser\AuthController;
 use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
+use App\Http\Controllers\Admin\FeaturedClientController\FeaturedClientController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Auctions\AuctionController;
@@ -87,6 +88,16 @@ Route::prefix('admin/properties')->middleware(['auth:sanctum', IsAdmin::class])-
 
     Route::get('/{id}', [AdminPropertyController::class, 'getProperty']);
 });
+
+
+Route::prefix('admin/clients')
+    ->middleware(['auth:sanctum', 'isAdmin'])
+    ->group(function () {
+        Route::get('/', [FeaturedClientController::class, 'index']);
+        Route::post('/', [FeaturedClientController::class, 'store']);
+        Route::put('/{id}', [FeaturedClientController::class, 'update']);
+        Route::delete('/{id}', [FeaturedClientController::class, 'destroy']);
+    });
 
 
 //User
