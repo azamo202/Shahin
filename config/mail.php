@@ -48,6 +48,16 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
+        'sendgrid' => [
+            'transport' => 'smtp',
+            'host' => 'smtp.sendgrid.net',
+            'port' => 587,
+            'username' => 'apikey', // تبقى كما هي
+            'password' => env('SENDGRID_API_KEY'), // نقرأ المفتاح من .env
+            'encryption' => null, // أو 'tls' حسب ما يشتغل معك
+            'timeout' => null,
+        ],
+
 
         'ses' => [
             'transport' => 'ses',
