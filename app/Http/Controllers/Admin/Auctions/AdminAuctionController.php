@@ -193,7 +193,7 @@ class AdminAuctionController extends Controller
     public function changeStatus(Request $request, $id): JsonResponse
     {
         $request->validate([
-            'status' => 'required|in:مقبول,قيد المراجعة,مرفوض'
+            'status' => 'required|in:مفتوح,قيد المراجعة,مرفوض'
         ]);
 
         try {
