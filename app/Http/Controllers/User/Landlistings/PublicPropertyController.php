@@ -9,14 +9,25 @@ use Illuminate\Http\Request;
 class PublicPropertyController extends Controller
 {
 
-    public function latestProperties()
+    public function latestProperties(Request $request)
     {
-        $properties = Property::latestPublic()->get();
+        $limit = $request->get('limit', 7);
+
+        $query = Property::whereIn('status', ['مفتوح', 'تم البيع'])->with('images');
+
+        // تطبيق الفلاتر باستخدام نفس الدالة applyFilters
+        $query = $this->applyFilters($query, $request);
+
+        // ترتيب حسب التاريخ الافتراضي
+        $query = $this->applySorting($query, $request);
+
+        $properties = $query->take($limit)->get();
 
         return response()->json([
             'status' => true,
             'data' => $properties,
-            'message' => 'تم جلب آخر 7 أراضي بنجاح'
+            'filters_applied' => $this->getAppliedFilters($request),
+            'message' => "تم جلب آخر {$limit} عقارات بنجاح"
         ]);
     }
 

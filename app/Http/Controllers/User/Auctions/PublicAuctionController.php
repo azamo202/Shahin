@@ -18,9 +18,32 @@ class PublicAuctionController extends Controller
             // عدد النتائج (افتراضي 7 ويمكن تغييره من الفرونت)
             $limit = $request->get('limit', 7);
 
-            $auctions = Auction::whereIn('status', ['مفتوح', 'تم البيع'])
-                ->with(['company:id,user_id,auction_name', 'images', 'videos'])
-                ->latest() // أو ->orderBy('auction_date','desc')
+            $query = Auction::whereIn('status', ['مفتوح', 'تم البيع'])
+                ->with(['company:id,user_id,auction_name', 'images', 'videos']);
+
+            // تطبيق عوامل الفلترة
+            if ($request->filled('keyword')) {
+                $keyword = $request->keyword;
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('title', 'LIKE', "%{$keyword}%")
+                        ->orWhere('description', 'LIKE', "%{$keyword}%");
+                });
+            }
+
+            if ($request->filled('start_date')) {
+                $query->whereDate('auction_date', '>=', $request->start_date);
+            }
+
+            if ($request->filled('end_date')) {
+                $query->whereDate('auction_date', '<=', $request->end_date);
+            }
+
+            if ($request->filled('region')) {
+                $query->where('address', 'LIKE', "%{$request->region}%");
+            }
+
+            // ترتيب النتائج بحسب التاريخ أو آخر إضافة
+            $auctions = $query->orderBy('auction_date', 'desc')
                 ->take($limit)
                 ->get();
 
