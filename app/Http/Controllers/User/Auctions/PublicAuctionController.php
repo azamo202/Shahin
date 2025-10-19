@@ -56,7 +56,7 @@ class PublicAuctionController extends Controller
         return $this->handleAuctionQuery($request, function ($query) use ($request) {
             $sortBy = $request->get('sort_by', 'auction_date');
             $sortOrder = $request->get('sort_order', 'desc');
-            
+
             return $query->orderBy($sortBy, $sortOrder)
                 ->paginate($request->get('per_page', 12));
         }, 'البحث في المزادات');
@@ -70,8 +70,17 @@ class PublicAuctionController extends Controller
         try {
             $query = $this->buildBaseQuery($request);
             $this->applyFilters($query, $request);
-            
+
             $result = $resultHandler($query);
+
+            // التحقق إذا كانت النتيجة فارغة
+            if ($result->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'data' => [],
+                    'message' => 'لا يوجد مزادات تطابق بحثك حالياً'
+                ]);
+            }
 
             return $this->jsonResponse($result, $message);
         } catch (\Exception $e) {
@@ -84,7 +93,7 @@ class PublicAuctionController extends Controller
      */
     private function buildBaseQuery(Request $request)
     {
-        $statuses = $request->route()->getName() === 'auctions.latest' 
+        $statuses = $request->route()->getName() === 'auctions.latest'
             ? ['مفتوح', 'تم البيع']
             : ['مفتوح'];
 
@@ -104,8 +113,8 @@ class PublicAuctionController extends Controller
             $keyword = $request->$searchField;
             $query->where(function ($q) use ($keyword) {
                 $q->where('title', 'LIKE', "%{$keyword}%")
-                  ->orWhere('description', 'LIKE', "%{$keyword}%")
-                  ->orWhere('address', 'LIKE', "%{$keyword}%");
+                    ->orWhere('description', 'LIKE', "%{$keyword}%")
+                    ->orWhere('address', 'LIKE', "%{$keyword}%");
             });
         }
 
