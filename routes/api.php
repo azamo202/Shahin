@@ -17,10 +17,20 @@ use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Auctions\AuctionController;
 use App\Http\Controllers\Admin\Auctions\AdminAuctionController;
 use App\Http\Controllers\User\Auctions\PublicAuctionController;
+use App\Http\Controllers\User\Auth\VerificationController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
+
+
+
+Route::post('email/verification-notification', [VerificationController::class, 'resend'])
+    ->middleware('auth:sanctum'); // أو احسب طريقة المصادقة عندك
+
+Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
+    ->name('verification.verify') // مهم لأنه نفس الاسم المستخدم في temporarySignedRoute
+    ->middleware('auth:sanctum'); // يضمن أن الرابط موقع وصالح
 
 Route::get('/user', function (Request $request) {
     return $request->user();

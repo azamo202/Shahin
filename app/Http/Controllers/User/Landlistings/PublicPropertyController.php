@@ -41,7 +41,6 @@ class PublicPropertyController extends Controller
         return $this->jsonResponse(true, $property, 'بيانات العقار');
     }
 
-    /** معالجة طلبات العقارات */
     private function handlePropertyRequest(Request $request, callable $resultHandler, string $message): JsonResponse
     {
         $query = Property::whereIn('status', ['مفتوح', 'تم البيع'])->with('images');
@@ -54,19 +53,23 @@ class PublicPropertyController extends Controller
             return $this->jsonResponse(false, [], 'لا توجد عقارات تطابق بحثك حالياً', 200, true);
         }
 
-        $responseData = ['data' => is_array($result) ? $result : $result->items()];
-
+        // تحقق نوع النتيجة قبل استخدام items()
         if ($result instanceof LengthAwarePaginator) {
+            $responseData = ['data' => $result->items()];
             $responseData['pagination'] = [
                 'current_page' => $result->currentPage(),
                 'last_page' => $result->lastPage(),
                 'per_page' => $result->perPage(),
                 'total' => $result->total()
             ];
+        } else {
+            // هنا Collection مباشرة بدون items()
+            $responseData = ['data' => $result];
         }
 
         return $this->jsonResponse(true, $responseData, $message, 200, true);
     }
+
 
     /** تطبيق الفلاتر */
     private function applyFilters($query, Request $request): void
