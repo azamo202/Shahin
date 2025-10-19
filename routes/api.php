@@ -106,6 +106,7 @@ Route::prefix('clients')->group(function () {
 Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
 
     Route::get('auctions', [AdminAuctionController::class, 'index']);
+    Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
     Route::get('auctions/{id}', [AdminAuctionController::class, 'show']);
     Route::get('auctions/pending/list', [AdminAuctionController::class, 'pending']);
     Route::post('auctions/{id}/approve', [AdminAuctionController::class, 'approve']);
