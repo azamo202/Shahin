@@ -22,7 +22,17 @@ use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
+use Illuminate\Support\Facades\Mail;
 
+
+
+Route::get('/test-email', function() {
+    Mail::raw('رسالة اختبار من Laravel عبر SendGrid', function($message) {
+        $message->to('ali775836287@gmail.com')
+                ->subject('اختبار إرسال الإيميل');
+    });
+    return 'تم إرسال الإيميل';
+});
 
 // تحقق من البريد
 Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
