@@ -24,13 +24,14 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 
 
-
-Route::post('email/verification-notification', [VerificationController::class, 'resend'])
-    ->middleware('auth:sanctum'); // أو احسب طريقة المصادقة عندك
-
+// تحقق من البريد
 Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
-    ->name('verification.verify') // مهم لأنه نفس الاسم المستخدم في temporarySignedRoute
-    ->middleware('auth:sanctum'); // يضمن أن الرابط موقع وصالح
+    ->name('verification.verify')
+    ->middleware('signed');
+
+// إعادة إرسال رابط التحقق
+Route::post('email/verification-notification', [VerificationController::class, 'resend'])
+    ->middleware('auth:sanctum');
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -124,7 +125,6 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     Route::delete('auctions/{id}', [AdminAuctionController::class, 'destroy']);
     Route::post('auctions/{id}/change-status', [AdminAuctionController::class, 'changeStatus']);
     Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
-
 });
 
 
