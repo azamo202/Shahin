@@ -18,6 +18,7 @@ use App\Http\Controllers\User\Auctions\AuctionController;
 use App\Http\Controllers\Admin\Auctions\AdminAuctionController;
 use App\Http\Controllers\User\Auctions\PublicAuctionController;
 use App\Http\Controllers\User\Auth\VerificationController;
+use App\Http\Controllers\User\Interested\InterestedController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\IsAdmin;
@@ -81,6 +82,7 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::get('/users', [AdminUserController::class, 'index']);
     Route::get('/users/approved', [AdminUserController::class, 'approved']);
     Route::get('/users/pending', [AdminUserController::class, 'pending']);
+    Route::get('/users/rejected', [AdminUserController::class, 'pending']);
     Route::post('/users/{id}/approve', [AdminUserController::class, 'approve']);
     Route::post('/users/{id}/reject', [AdminUserController::class, 'reject']);
     Route::post('/logout', [AuthAdminController::class, 'logout']);
@@ -161,6 +163,11 @@ Route::middleware('auth:sanctum')->prefix('user/properties')->group(function () 
     Route::get('/status/{status}', [PropertyController::class, 'getByStatus']);
     Route::get('/stats', [PropertyController::class, 'getStats']);
 });
+
+// تسجيل اهتمام جديد بعقار
+Route::post('/interested', [InterestedController::class, 'store'])
+    ->name('interested.store')
+    ->middleware('auth:sanctum');
 
 
 // روابط المزادات العامة
