@@ -60,6 +60,9 @@ Route::post('/email/verification-notification', function (Request $request) {
     return response()->json(['message' => 'تم إرسال رابط التحقق إلى بريدك']);
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
+
+
+
 // تسجيل مستخدم جديد
 Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
@@ -143,7 +146,7 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     
     // إدارة طلبات الاهتمام
-    Route::prefix('interests')->group(function () {
+    Route::prefix('admin/interests')->group(function () {
         Route::get('/', [AdminInterestController::class, 'index']);
         Route::get('/statistics', [AdminInterestController::class, 'getStatistics']);
         Route::get('/{id}', [AdminInterestController::class, 'show']);
@@ -178,7 +181,7 @@ Route::middleware('auth:sanctum')->prefix('user/properties')->group(function () 
 });
 
 // تسجيل اهتمام جديد بعقار
-Route::post('/interested', [InterestedController::class, 'store'])
+Route::post('user/interested', [InterestedController::class, 'store'])
     ->name('interested.store')
     ->middleware('auth:sanctum');
 
