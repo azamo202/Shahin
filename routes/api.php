@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Auctions\AuctionController;
 use App\Http\Controllers\Admin\Auctions\AdminAuctionController;
+use App\Http\Controllers\Admin\Interested\AdminInterestController;
 use App\Http\Controllers\User\Auctions\PublicAuctionController;
 use App\Http\Controllers\User\Auth\VerificationController;
 use App\Http\Controllers\User\Interested\InterestedController;
@@ -138,7 +139,19 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('auctions/{id}/change-status', [AdminAuctionController::class, 'changeStatus']);
     Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
 });
-
+// رواتات الإدارة (لوحة التحكم)
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    
+    // إدارة طلبات الاهتمام
+    Route::prefix('interests')->group(function () {
+        Route::get('/', [AdminInterestController::class, 'index']);
+        Route::get('/statistics', [AdminInterestController::class, 'getStatistics']);
+        Route::get('/{id}', [AdminInterestController::class, 'show']);
+        Route::put('/{id}/status', [AdminInterestController::class, 'updateStatus']);
+        Route::delete('/{id}', [AdminInterestController::class, 'destroy']);
+    });
+});
+    
 
 //User
 

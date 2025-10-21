@@ -20,11 +20,11 @@ class InterestedController extends Controller
     public function store(Request $request): JsonResponse
     {
         DB::beginTransaction();
-        
+
         try {
             // التحقق من صحة البيانات المدخلة
             $validatedData = $this->validateRequest($request);
-            
+
             // التحقق من وجود العقار ونشاطه
             $property = $this->getActiveProperty($validatedData['property_id']);
             if (!$property) {
@@ -38,23 +38,21 @@ class InterestedController extends Controller
 
             // إنشاء سجل الاهتمام
             $interested = $this->createInterestRecord($validatedData);
-            
+
             DB::commit();
 
-           /*
+            /*
             $this->sendNotifications($interested, $property);
             */
-            
+
             return $this->successResponse(
                 $this->formatResponseData($interested),
                 'تم تسجيل اهتمامك بالعقار بنجاح، وسنتواصل معك قريباً.',
                 201
             );
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             return $this->validationErrorResponse($e);
-            
         } catch (\Exception $e) {
             Log::error('فشل في تسجيل الاهتمام بالعقار: ' . $e->getMessage(), [
                 'property_id' => $request->property_id,
@@ -101,7 +99,7 @@ class InterestedController extends Controller
     private function hasDuplicateInterest(array $data): bool
     {
         $cacheKey = "interest_duplicate:{$data['email']}:{$data['property_id']}";
-        
+
         if (Cache::has($cacheKey)) {
             return true;
         }
@@ -132,8 +130,10 @@ class InterestedController extends Controller
             'message'     => $this->sanitizeMessage($data['message']),
             'user_id'     => $user?->id,
             'property_id' => $data['property_id'],
+            'status'      => 'قيد المراجعة', // الحالة الافتراضية
         ]);
     }
+
 
 
     /**
@@ -180,6 +180,7 @@ class InterestedController extends Controller
             'email' => $interested->email,
             'phone' => $interested->phone,
             'property_id' => $interested->property_id,
+            'status' => $interested->status,
             'submitted_at' => $interested->created_at->toDateTimeString(),
             'reference_number' => 'INT-' . str_pad($interested->id, 6, '0', STR_PAD_LEFT)
         ];

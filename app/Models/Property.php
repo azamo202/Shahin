@@ -272,4 +272,8 @@ class Property extends Model
             ->latest()
             ->take($limit);
     }
+    public function interests()
+    {
+        return $this->hasMany(Interested::class);
+    }
 }
