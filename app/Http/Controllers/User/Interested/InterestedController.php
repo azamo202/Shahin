@@ -20,11 +20,11 @@ class InterestedController extends Controller
     public function store(Request $request): JsonResponse
     {
         DB::beginTransaction();
-
+        
         try {
             // التحقق من صحة البيانات المدخلة
             $validatedData = $this->validateRequest($request);
-
+            
             // التحقق من وجود العقار ونشاطه
             $property = $this->getActiveProperty($validatedData['property_id']);
             if (!$property) {
@@ -38,21 +38,23 @@ class InterestedController extends Controller
 
             // إنشاء سجل الاهتمام
             $interested = $this->createInterestRecord($validatedData);
-
+            
             DB::commit();
 
-            /*
+           /*
             $this->sendNotifications($interested, $property);
             */
-
+            
             return $this->successResponse(
                 $this->formatResponseData($interested),
                 'تم تسجيل اهتمامك بالعقار بنجاح، وسنتواصل معك قريباً.',
                 201
             );
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
             return $this->validationErrorResponse($e);
+            
         } catch (\Exception $e) {
             Log::error('فشل في تسجيل الاهتمام بالعقار: ' . $e->getMessage(), [
                 'property_id' => $request->property_id,
@@ -60,12 +62,7 @@ class InterestedController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // مؤقتًا فقط للتجربة
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ], 500);
+            return $this->errorResponse('حدث خطأ غير متوقع أثناء تسجيل الاهتمام. يرجى المحاولة مرة أخرى.');
         }
     }
 
@@ -104,7 +101,7 @@ class InterestedController extends Controller
     private function hasDuplicateInterest(array $data): bool
     {
         $cacheKey = "interest_duplicate:{$data['email']}:{$data['property_id']}";
-
+        
         if (Cache::has($cacheKey)) {
             return true;
         }
@@ -126,7 +123,6 @@ class InterestedController extends Controller
 
     private function createInterestRecord(array $data): Interested
     {
-        
         $user = Auth::user();
 
         return Interested::create([
