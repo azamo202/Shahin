@@ -17,7 +17,7 @@ class Interested extends Model
         'email',
         'message',
         'user_id',
-        'land_id',
+        'property_id',
     ];
 
     // علاقة باليوزر (إذا مسجل)

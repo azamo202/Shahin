@@ -126,6 +126,7 @@ class InterestedController extends Controller
 
     private function createInterestRecord(array $data): Interested
     {
+        
         $user = Auth::user();
 
         return Interested::create([
