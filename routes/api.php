@@ -142,11 +142,10 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     Route::post('auctions/{id}/change-status', [AdminAuctionController::class, 'changeStatus']);
     Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
 });
-// رواتات الإدارة (لوحة التحكم)
-Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
-    
-    // إدارة طلبات الاهتمام
-    Route::prefix('admin/interests')->group(function () {
+
+ // إدارة طلبات الاهتمام
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () { 
+    Route::prefix('/interests')->group(function () {
         Route::get('/', [AdminInterestController::class, 'index']);
         Route::get('/statistics', [AdminInterestController::class, 'getStatistics']);
         Route::get('/{id}', [AdminInterestController::class, 'show']);
