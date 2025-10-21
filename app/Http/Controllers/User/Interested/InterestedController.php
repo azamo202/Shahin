@@ -73,7 +73,7 @@ class InterestedController extends Controller
     {
         return $request->validate([
             'full_name'    => 'required|string|max:255|min:2',
-            'phone'        => 'required|string|max:20|min:10',
+            'phone'        => 'required|string|max:20|min:5',
             'email'        => 'required|email|max:255',
             'message'      => 'required|string|min:10|max:1000',
             'property_id'  => 'required|exists:properties,id',
