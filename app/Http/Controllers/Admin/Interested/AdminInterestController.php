@@ -20,7 +20,7 @@ class AdminInterestController extends Controller
     {
         try {
             $query = Interested::with(['property' => function ($query) {
-                $query->select('id', 'title', 'reference_number');
+                $query->select('id', 'title');
             }])->with(['user' => function ($query) {
                 $query->select('id', 'full_name');
             }]);
@@ -89,13 +89,11 @@ class AdminInterestController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            // ✅ أضف هذا أثناء التطوير فقط
+           
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ أثناء جلب طلبات الاهتمام.',
-                'error' => $e->getMessage(), // 🔥 يظهر نص الخطأ الحقيقي
-                'line' => $e->getLine(),     // 🔥 يظهر رقم السطر اللي حصل فيه الخطأ
-                'file' => $e->getFile(),     // 🔥 يظهر اسم الملف
+                'error' => $e->getMessage()
             ], 500);
         }
     }
