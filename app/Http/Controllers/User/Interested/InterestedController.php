@@ -82,8 +82,6 @@ class InterestedController extends Controller
             'full_name.min'      => 'الاسم الكامل يجب أن يكون على الأقل حرفين.',
             'phone.required'     => 'رقم الهاتف مطلوب.',
             'phone.min'          => 'رقم الهاتف يجب أن يكون على الأقل 10 أرقام.',
-            'message.min'        => 'الرسالة يجب أن تكون على الأقل 10 أحرف.',
-            'message.max'        => 'الرسالة يجب ألا تتجاوز 1000 حرف.',
         ]);
     }
 
@@ -134,8 +132,6 @@ class InterestedController extends Controller
             'message'     => $this->sanitizeMessage($data['message']),
             'user_id'     => $user?->id,
             'property_id' => $data['property_id'],
-            'ip_address'  => request()->ip(),
-            'user_agent'  => request()->userAgent(),
         ]);
     }
 
