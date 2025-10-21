@@ -89,7 +89,7 @@ class AdminInterestController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-           
+
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ أثناء جلب طلبات الاهتمام.',
@@ -104,7 +104,8 @@ class AdminInterestController extends Controller
     public function show($id): JsonResponse
     {
         try {
-            $interest = Interested::with(['property', 'user'])->findOrFail($id);
+            // نحمل فقط العقار المرتبط بدون المستخدم
+            $interest = Interested::with('property')->findOrFail($id);
 
             return response()->json([
                 'success' => true,
@@ -122,6 +123,7 @@ class AdminInterestController extends Controller
             ], 404);
         }
     }
+
 
     /**
      * تحديث حالة طلب الاهتمام
