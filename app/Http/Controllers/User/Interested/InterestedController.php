@@ -60,7 +60,12 @@ class InterestedController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
-            return $this->errorResponse('حدث خطأ غير متوقع أثناء تسجيل الاهتمام. يرجى المحاولة مرة أخرى.');
+            // مؤقتًا فقط للتجربة
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ], 500);
         }
     }
 
@@ -118,18 +123,20 @@ class InterestedController extends Controller
         return false;
     }
 
+
     private function createInterestRecord(array $data): Interested
     {
+        $user = Auth::user();
+
         return Interested::create([
-            'full_name'   => $data['full_name'],
-            'phone'       => $data['phone'],
-            'email'       => $data['email'],
+            'full_name'   => $user?->full_name ?? $data['full_name'],
+            'phone'       => $user?->phone ?? $data['phone'],
+            'email'       => $user?->email ?? $data['email'],
             'message'     => $this->sanitizeMessage($data['message']),
-            'user_id'     => null, // لأننا لا نستخدم بيانات المستخدم من التوكن
+            'user_id'     => $user?->id,
             'property_id' => $data['property_id'],
         ]);
     }
-
 
 
     /**
