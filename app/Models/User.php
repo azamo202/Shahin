@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -35,6 +36,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new VerifyEmailNotification());
+    }
 
     // علاقة نوع المستخدم
 
@@ -92,5 +99,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Auction::class, 'user_id');
     }
-    
 }

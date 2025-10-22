@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class AdminUserController extends Controller
 {
     /**
-     * عرض جميع المستخدمين مع التصفية
+     * عرض جميع المستخدمين مع التصفية والترتيب
      */
     public function index(Request $request): JsonResponse
     {
@@ -31,13 +31,30 @@ class AdminUserController extends Controller
             $query->where('user_type_id', $request->user_type_id);
         }
 
-        $users = $query->get()->map(function ($user) {
+        // الترتيب
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        // Pagination - جلب 10 فقط لكل صفحة
+        $users = $query->paginate(10);
+
+        // تنسيق البيانات
+        $formattedUsers = $users->getCollection()->map(function ($user) {
             return $this->formatUserData($user);
         });
 
         return response()->json([
             'success' => true,
-            'data' => $users,
+            'data' => $formattedUsers,
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem(),
+            ],
             'count' => $users->count()
         ]);
     }
@@ -54,13 +71,29 @@ class AdminUserController extends Controller
             $query->where('full_name', 'like', '%' . $request->search . '%');
         }
 
-        $users = $query->get()->map(function ($user) {
+        // الترتيب
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        // Pagination - جلب 10 فقط لكل صفحة
+        $users = $query->paginate(10);
+
+        $formattedUsers = $users->getCollection()->map(function ($user) {
             return $this->formatUserData($user);
         });
 
         return response()->json([
             'success' => true,
-            'data' => $users,
+            'data' => $formattedUsers,
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem(),
+            ],
             'count' => $users->count()
         ]);
     }
@@ -77,13 +110,29 @@ class AdminUserController extends Controller
             $query->where('full_name', 'like', '%' . $request->search . '%');
         }
 
-        $users = $query->get()->map(function ($user) {
+        // الترتيب
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        // Pagination - جلب 10 فقط لكل صفحة
+        $users = $query->paginate(10);
+
+        $formattedUsers = $users->getCollection()->map(function ($user) {
             return $this->formatUserData($user);
         });
 
         return response()->json([
             'success' => true,
-            'data' => $users,
+            'data' => $formattedUsers,
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem(),
+            ],
             'count' => $users->count()
         ]);
     }
@@ -100,13 +149,29 @@ class AdminUserController extends Controller
             $query->where('full_name', 'like', '%' . $request->search . '%');
         }
 
-        $users = $query->get()->map(function ($user) {
+        // الترتيب
+        $sortField = $request->get('sort_field', 'created_at');
+        $sortDirection = $request->get('sort_direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+
+        // Pagination - جلب 10 فقط لكل صفحة
+        $users = $query->paginate(10);
+
+        $formattedUsers = $users->getCollection()->map(function ($user) {
             return $this->formatUserData($user);
         });
 
         return response()->json([
             'success' => true,
-            'data' => $users,
+            'data' => $formattedUsers,
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'from' => $users->firstItem(),
+                'to' => $users->lastItem(),
+            ],
             'count' => $users->count()
         ]);
     }

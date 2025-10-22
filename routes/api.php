@@ -26,15 +26,24 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Mail;
 
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/home?verified=1');
+})->middleware(['signed'])->name('verification.verify');
 
 
-Route::get('/test-email', function() {
-    Mail::raw('رسالة اختبار من Laravel عبر SendGrid', function($message) {
-        $message->to('ali775836287@gmail.com')
-                ->subject('اختبار إرسال الإيميل');
-    });
-    return 'تم إرسال الإيميل';
+Route::get('/test-sendgrid', function () {
+    try {
+        Mail::raw('رسالة اختبار عبر SendGrid SMTP', function ($message) {
+            $message->to('azoz20113040@gmail.com') // البريد المستلم
+                ->subject('اختبار SendGrid');
+        });
+        return response()->json(['status' => 'success', 'message' => 'تم الإرسال عبر SendGrid']);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => $e->getMessage()]);
+    }
 });
+
 
 // تحقق من البريد
 Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])
@@ -48,18 +57,6 @@ Route::post('email/verification-notification', [VerificationController::class, '
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
-// رابط التحقق من البريد
-Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-    $request->fulfill();
-    return response()->json(['message' => 'تم التحقق من البريد الإلكتروني بنجاح']);
-})->middleware(['auth', 'signed'])->name('verification.verify');
-
-// رابط لإعادة إرسال الإيميل
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return response()->json(['message' => 'تم إرسال رابط التحقق إلى بريدك']);
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
 
 
 
@@ -143,8 +140,8 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
     Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
 });
 
- // إدارة طلبات الاهتمام
-Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () { 
+// إدارة طلبات الاهتمام
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
     Route::prefix('/interests')->group(function () {
         Route::get('/', [AdminInterestController::class, 'index']);
         Route::get('/statistics', [AdminInterestController::class, 'getStatistics']);
@@ -153,7 +150,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         Route::delete('/{id}', [AdminInterestController::class, 'destroy']);
     });
 });
-    
+
 
 //User
 
