@@ -11,6 +11,7 @@ use App\Http\Controllers\User\AuthUser\AuthController;
 use App\Http\Controllers\User\AuthUser\ProfileController;
 use App\Http\Controllers\User\AuthUser\RegisterController;
 use App\Http\Controllers\Admin\AdminUserController\AdminUserController;
+use App\Http\Controllers\Admin\AdminUserController\AdminUserReportController;
 use App\Http\Controllers\Admin\FeaturedClientController\FeaturedClientController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
@@ -98,6 +99,10 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
     Route::get('/profile', [ProfileAdminController::class, 'profile']);
     Route::put('/profile', [ProfileAdminController::class, 'updateProfile']);
     Route::delete('/delete-account', [ProfileAdminController::class, 'deleteAccount']);
+    Route::get('/users/report', [AdminUserReportController::class, 'report'])
+        ->name('admin.users.report');
+    Route::post('/users/report/export', [AdminUserReportController::class, 'exportReport'])
+        ->name('admin.users.report.export');
 });
 
 

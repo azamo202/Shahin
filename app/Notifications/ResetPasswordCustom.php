@@ -20,14 +20,15 @@ class ResetPasswordCustom extends Notification
     }
 
     public function toMail($notifiable)
-    {
-        $frontendUrl = config('app.frontend_url');
-        $url = "{$frontendUrl}/reset-password?token={$this->token}&email=" . urlencode($notifiable->email);
+{
+    $frontendUrl = config('app.frontend_url');
+    $url = "{$frontendUrl}/reset-password?token={$this->token}&email=" . urlencode($notifiable->email);
 
-        return (new MailMessage)
-                    ->subject('إعادة تعيين كلمة المرور')
-                    ->line('لقد استلمنا طلبك لإعادة تعيين كلمة المرور.')
-                    ->action('إعادة تعيين كلمة المرور', $url)
-                    ->line('إذا لم تطلب إعادة تعيين كلمة المرور، يمكنك تجاهل هذا البريد.');
-    }
+    return (new \Illuminate\Notifications\Messages\MailMessage)
+                ->view('emails.reset-password', [
+                    'url' => $url,
+                    'user' => $notifiable
+                ]);
+}
+
 }

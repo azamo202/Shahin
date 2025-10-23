@@ -44,7 +44,7 @@ class AdminAuctionController extends Controller
 
             // التقسيم إلى صفحات
             $auctions = $query->orderBy('auction_date', 'desc')
-                              ->paginate($request->get('per_page', 12));
+                              ->paginate($request->get('per_page', 10));
 
             return response()->json([
                 'success' => true,
