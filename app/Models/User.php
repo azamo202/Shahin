@@ -17,12 +17,13 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendPasswordResetNotification($token)
     {
-        $frontendUrl = config('app.frontend_url');
+        // رابط الفرونت إند
+        $frontendUrl = config('app.frontend_url'); // من .env FRONTEND_URL
         $url = "{$frontendUrl}/reset-password?token={$token}&email=" . urlencode($this->email);
 
+        // إرسال Notification مع الرابط المخصص
         $this->notify(new ResetPasswordNotification($url));
     }
-
 
 
 
