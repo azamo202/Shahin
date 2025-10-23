@@ -9,21 +9,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+  use App\Notifications\ResetPasswordCustom; // Notification مخصص
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
 
-    public function sendPasswordResetNotification($token)
-    {
-        // رابط الفرونت إند
-        $frontendUrl = config('app.frontend_url'); // من .env FRONTEND_URL
-        $url = "{$frontendUrl}/reset-password?token={$token}&email=" . urlencode($this->email);
 
-        // إرسال Notification مع الرابط المخصص
-        $this->notify(new ResetPasswordNotification($url));
-    }
+public function sendPasswordResetNotification($token)
+{
+    $this->notify(new ResetPasswordCustom($token));
+}
 
 
 
