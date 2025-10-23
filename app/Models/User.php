@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,18 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+
+    public function sendPasswordResetNotification($token)
+    {
+        $frontendUrl = config('app.frontend_url');
+        $url = "{$frontendUrl}/reset-password?token={$token}&email=" . urlencode($this->email);
+
+        $this->notify(new ResetPasswordNotification($url));
+    }
+
+
+
 
     // ✅ Constants للحالات لتجنب الأخطاء المطبعية
     const STATUS_PENDING  = 'pending';

@@ -50,11 +50,15 @@
 
         .logo-container {
             display: flex;
+            flex-direction: column;
+            /* يجعل العناصر فوق بعض */
             align-items: center;
+            /* يوسّطهم أفقيًا */
             justify-content: center;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 10px;
         }
+
 
         .logo-img {
             max-height: 50px;
@@ -120,16 +124,28 @@
         }
 
         .btn-primary {
-            background: #2c3e50;
-            color: #fff;
-            border: 1px solid #2c3e50;
+            background-color: #5dade2 !important;
+            /* أزرق فاتح ثابت */
+            color: #ffffff !important;
+            /* الخط أبيض ثابت */
+            border: 1px solid #5dade2 !important;
+            /* نفس لون الزر */
+            cursor: pointer;
+            text-decoration: none;
         }
 
-        .btn-primary:hover {
-            background: #34495e;
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+        /* إلغاء أي تأثير عند المرور بالماوس */
+        .btn-primary:hover,
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: #5dade2 !important;
+            /* يبقى أزرق فاتح */
+            color: #ffffff !important;
+            /* يبقى أبيض */
+            border: 1px solid #5dade2 !important;
         }
+
+
 
         /* الرابط البديل */
         .note {
@@ -243,52 +259,48 @@
     <div class="email-wrap" role="article" style="direction: rtl; text-align: right;">
         <div class="header">
             <div class="logo-container">
-                <img src="{{ url('images/logo.jpg') }}" alt="شاهين" class="logo-img">
+                <img src="{{ asset('images/logo.jpg') }}" alt="شاهين" class="logo-img">
                 <div class="site-name">شاهين</div>
             </div>
             <div class="header-tagline">منصتك الموثوقة للحلول المتكاملة</div>
         </div>
 
         <div class="content">
-            <div class="greeting">مرحباً {{ $user->name ?? 'صديقنا' }},</div>
+            <div class="greeting">مرحباً {{ $user->full_name ?? 'بالمستخدم' }},</div>
             <div class="lead">
-                نشكرك على تسجيلك في منصة <span class="highlight">شاهين</span>.
-                لتأكيد بريدك الإلكتروني والتمتع بكامل مزايا الحساب، يرجى الضغط على الزر أدناه.
-            </div>
-
-            <div class="warning">
-                <strong>تنبيه:</strong> يرجى التأكد من أن هذا البريد الإلكتروني موجه إليك قبل المتابعة.
-            </div>
-
-            <div class="btn-wrap">
-                <a href="{{ $url }}" class="btn btn-primary" target="_blank" rel="noopener">تأكيد البريد
-                    الإلكتروني</a>
-            </div>
-
-            <div class="note">
-                <p>إذا لم يعمل الزر أعلاه، يمكنك نسخ الرابط التالي ولصقه في متصفح الويب:</p>
-                <div class="link-container">
-                    <a class="link" href="{{ $url }}">{{ $url }}</a>
-                </div>
-            </div>
-
-            <div class="note">
-                <strong>معلومة هامة:</strong> هذا الرابط صالح لمدة 60 دقيقة فقط.
-                في حال انتهاء المدة، يمكنك طلب رابط جديد من خلال صفحة إعدادات حسابك.
+                نشكركم على انضمامكم إلى منصة <span class="highlight">شاهين</span>، المنصة الرائدة في بيع الأراضي وعرض
+                المزادات العقارية.
+                لتفعيل حسابكم والاستفادة من جميع خدماتنا وفرص الاستثمار المميزة، نرجو الضغط على زر "تأكيد البريد
+                الإلكتروني" أدناه.
             </div>
         </div>
 
-        <div class="footer">
-            <div>
-                <a href="#">الرئيسية</a> |
-                <a href="#">اتصل بنا</a> |
-                <a href="#">الدعم الفني</a>
-            </div>
-            <div class="copyright">
-                تحياتنا — فريق عمل <strong>شاهين</strong><br>
-                © {{ date('Y') }} جميع الحقوق محفوظة
-            </div>
+        <div class="warning">
+            <strong>تنبيه:</strong> يرجى التأكد من أن هذا البريد الإلكتروني موجه إليك قبل المتابعة.
         </div>
+
+        <div class="btn-wrap">
+            <a href="{{ $url }}" class="btn btn-primary" target="_blank" rel="noopener">تأكيد البريد
+                الإلكتروني</a>
+        </div>
+
+        <div class="note">
+            <strong>معلومة هامة:</strong> هذا الرابط صالح لمدة 60 دقيقة فقط.
+            في حال انتهاء المدة، يمكنك طلب رابط جديد من خلال صفحة إعدادات حسابك.
+        </div>
+    </div>
+
+    <div class="footer">
+        <div>
+            <a href="#">الرئيسية</a> |
+            <a href="#">اتصل بنا</a> |
+            <a href="#">الدعم الفني</a>
+        </div>
+        <div class="copyright">
+            تحياتنا — فريق عمل <strong>شاهين</strong><br>
+            © {{ date('Y') }} جميع الحقوق محفوظة
+        </div>
+    </div>
     </div>
 </body>
 

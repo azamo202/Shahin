@@ -18,6 +18,8 @@ use App\Http\Controllers\User\Auctions\AuctionController;
 use App\Http\Controllers\Admin\Auctions\AdminAuctionController;
 use App\Http\Controllers\Admin\Interested\AdminInterestController;
 use App\Http\Controllers\User\Auctions\PublicAuctionController;
+use App\Http\Controllers\User\Auth\ForgotPasswordController;
+use App\Http\Controllers\User\Auth\ResetPasswordController;
 use App\Http\Controllers\User\Auth\VerificationController;
 use App\Http\Controllers\User\Interested\InterestedController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
@@ -25,6 +27,11 @@ use App\Http\Controllers\User\Landlistings\PublicPropertyController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Mail;
+
+
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
