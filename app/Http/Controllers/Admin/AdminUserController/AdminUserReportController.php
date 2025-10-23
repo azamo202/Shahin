@@ -94,7 +94,7 @@ class AdminUserReportController extends Controller
             'auctionCompany' => function($query) {
                 $query->select(['id', 'user_id', 'company_name', 'auction_license', 'created_at']);
             }
-        ])->withCount(['properties', 'bids', 'auctions']);
+        ])->withCount(['properties', 'auctions']);
 
         // Apply filters
         $this->applyFilters($query, $filters);
@@ -173,7 +173,6 @@ class AdminUserReportController extends Controller
             'profile_details' => $this->getUserProfileDetails($user),
             'statistics' => [
                 'properties_count' => $user->properties_count ?? 0,
-                'bids_count' => $user->bids_count ?? 0,
                 'auctions_count' => $user->auctions_count ?? 0,
             ],
             'dates' => [
