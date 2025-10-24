@@ -17,7 +17,9 @@ use App\Http\Controllers\Admin\Landlistings\AdminPropertyController;
 use App\Http\Controllers\Admin\Landlistings\AdminPropertyStatusController;
 use App\Http\Controllers\User\Auctions\AuctionController;
 use App\Http\Controllers\Admin\Auctions\AdminAuctionController;
+use App\Http\Controllers\Admin\Auctions\AdminAuctionReportController;
 use App\Http\Controllers\Admin\Interested\AdminInterestController;
+use App\Http\Controllers\Admin\interested\AdminInterestReportController;
 use App\Http\Controllers\User\Auctions\PublicAuctionController;
 use App\Http\Controllers\User\Auth\ForgotPasswordController;
 use App\Http\Controllers\User\Auth\ResetPasswordController;
@@ -140,7 +142,7 @@ Route::prefix('clients')->group(function () {
 
 //إدارة المزادات
 Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
-
+    Route::get('auction/report', [AdminAuctionReportController::class, 'report']);
     Route::get('auctions', [AdminAuctionController::class, 'index']);
     Route::get('auctions/statistics', [AdminAuctionController::class, 'statistics']);
     Route::get('auctions/{id}', [AdminAuctionController::class, 'show']);
@@ -154,6 +156,7 @@ Route::prefix('admin')->middleware(['auth:sanctum'])->group(function () {
 
 // إدارة طلبات الاهتمام
 Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    Route::get('interests/report', [AdminInterestReportController::class, 'report']);
     Route::prefix('/interests')->group(function () {
         Route::get('/', [AdminInterestController::class, 'index']);
         Route::get('/statistics', [AdminInterestController::class, 'getStatistics']);

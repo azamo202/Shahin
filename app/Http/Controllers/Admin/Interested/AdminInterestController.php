@@ -143,6 +143,7 @@ class AdminInterestController extends Controller
             $oldStatus = $interest->status;
             $interest->status = $request->status;
 
+            // تحديث الملاحظات سواء كانت موجودة أو null
             if ($request->has('admin_notes')) {
                 $interest->admin_notes = $request->admin_notes;
             }
