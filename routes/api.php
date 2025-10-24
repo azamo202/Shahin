@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\AdminReportsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthAdmin\ProfileAdminController;
@@ -105,6 +107,9 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
         ->name('admin.users.report');
     Route::post('/users/report/export', [AdminUserReportController::class, 'exportReport'])
         ->name('admin.users.report.export');
+    Route::get('reports', [AdminReportsController::class, 'index']);
+    Route::get('dashboard/statistics', [AdminDashboardController::class, 'statistics']);
+
 });
 
 
