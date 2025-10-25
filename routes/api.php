@@ -29,6 +29,7 @@ use App\Http\Controllers\User\Auth\VerificationController;
 use App\Http\Controllers\User\Interested\InterestedController;
 use App\Http\Controllers\User\Landlistings\PropertyController;
 use App\Http\Controllers\User\Landlistings\PublicPropertyController;
+use App\Http\Controllers\User\LandRequest\LandRequestController;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\UserMiddleware;
 use Illuminate\Support\Facades\Mail;
@@ -109,7 +110,6 @@ Route::middleware(['auth:sanctum', IsAdmin::class])->prefix('admin')->group(func
         ->name('admin.users.report.export');
     Route::get('reports', [AdminReportsController::class, 'index']);
     Route::get('dashboard/statistics', [AdminDashboardController::class, 'statistics']);
-
 });
 
 
@@ -197,9 +197,12 @@ Route::middleware('auth:sanctum')->prefix('user/properties')->group(function () 
 });
 
 // تسجيل اهتمام جديد بعقار
-Route::post('user/interested', [InterestedController::class, 'store'])
-    ->name('interested.store')
-    ->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('user/interested', [InterestedController::class, 'store'])
+        ->name('interested.store');
+    Route::get('user/interests/my', [InterestedController::class, 'myInterests'])
+        ->name('interested.my');
+});
 
 
 // روابط المزادات العامة
@@ -216,3 +219,20 @@ Route::middleware('auth:sanctum')->prefix('user/auctions')->group(function () {
     Route::delete('/{id}', [AuctionController::class, 'destroy']);
     Route::get('/status/{status}', [AuctionController::class, 'getByStatus']);
 });
+
+
+// 🔐 هذه المسارات تحتاج تسجيل دخول (auth:sanctum)
+Route::middleware('auth:sanctum')->group(function () {
+    // إنشاء طلب جديد
+    Route::post('/land-requests', [LandRequestController::class, 'store']);
+
+    // جلب الطلبات الخاصة بالمستخدم الحالي
+    Route::get('/land-requests/my', [LandRequestController::class, 'myRequests']);
+    Route::put('/land-requests/{id}', [LandRequestController::class, 'update']);
+});
+
+// 🌍 هذه المسارات عامة (متاحة للجميع)
+Route::get('/land-requests', [LandRequestController::class, 'allRequests']);
+Route::get('/land-requests/{id}', [LandRequestController::class, 'show']);
+
+

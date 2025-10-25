@@ -134,6 +134,33 @@ class InterestedController extends Controller
         ]);
     }
 
+    
+    public function myInterests(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return $this->errorResponse('يجب تسجيل الدخول لعرض الاهتمامات.', 401);
+        }
+
+        $interests = Interested::with('property')
+            ->where('user_id', $user->id)
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn($interest) => [
+                'id' => $interest->id,
+                'property_title' => $interest->property->title ?? 'غير محدد',
+                'status' => $interest->status,
+                'submitted_at' => $interest->created_at->format('Y-m-d H:i'),
+                'reference_number' => 'INT-' . str_pad($interest->id, 6, '0', STR_PAD_LEFT)
+            ]);
+
+        return $this->successResponse(
+            $interests->toArray(), // <--- هنا
+            'تم جلب اهتماماتك بنجاح.'
+        );
+    }
+
 
 
     /**
